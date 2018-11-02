@@ -44,7 +44,8 @@ def simulate_timesteps(self):
         
         self.record_timestep_data(timestep);
 
-    self.elapsed_time = time.time() - start_time;
+    self.elapsed_time = time.time() - start_time
+    self.final_avg_cc_rate = np.mean(self.avg_cc_data)
     print "Elapsed time: {:.2f} sec".format(self.elapsed_time)
     self.plot_timestep_data()
 

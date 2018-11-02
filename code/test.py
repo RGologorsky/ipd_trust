@@ -2,7 +2,12 @@ import numpy as np
 
 from sim_class import Sim
 
-new_simulation = Sim(T=10**4)
+from pure_12_game_class import Pure_12_Game
+from pure_16_game_class import Pure_16_Game
+from pure_one_game_class import Pure_One_Game
+
+game = Pure_16_Game(b1=1.9, b2=1.2, c=1.0)
+new_simulation = Sim(T=10**4, game = game)
 
 new_simulation.init_strategy_population(s_initial = 0)
 new_simulation.simulate_timesteps()

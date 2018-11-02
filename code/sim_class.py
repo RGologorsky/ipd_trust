@@ -24,23 +24,14 @@ class Sim:
         self.s_cc_rates    = new_s_cc_rates    * np.ones((1,1))
         self.s_game1_rates = new_s_game1_rates * np.ones((1,1))
 
-    def __init__(self, T):
+    def __init__(self, T, game):
 
         # Settings
         self.do_plots = True
 
-        # Game values
-        self.b1 = 1.8; # benefit coop in Game 1
-        self.b2 = 1.2; # benefit coop in Game 2
-        self.c  = 1;   # cost to coop in both games
-
-         #player1, player2 payoffs for outcomes 1CC, ..., 1DD, 2CC, ..., 2DD
-        b1, b2, c = self.b1, self.b2, self.c
-        self.p1_payoffs = [b1-c, -c, b1, 0, b2-c, -c, b2, 0];
-        self.p2_payoffs = [b1-c, b1, -c, 0, b2-c, b2, -c, 0];
-
-        # Strategies in [0,1]^16
-        self.max_num_strategies = 2**16
+        # Game: encapsulates b,c values, rules, strategy space.
+        self.game = game
+        self.max_num_strategies = game.max_num_strategies
 
         # Evolution Parameters
         self.T    = T; # timesteps

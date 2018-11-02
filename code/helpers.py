@@ -97,10 +97,10 @@ def add_strategy(self, new_strategy):
         
     # get new strategy's stats against currently active strategies
     [new_s_payoffs, strat_payoffs, new_s_cc_rates, new_s_game1_rates] = \
-        zip(*[self.mc_estimate(new_strategy, strat) for strat in self.s_active])
+        zip(*[self.game.mc_estimate(new_strategy, strat) for strat in self.s_active])
 
     s_self_payoff, _, s_self_cc_rate, s_self_game1_rate = \
-        self.mc_estimate(new_strategy, new_strategy)
+        self.game.mc_estimate(new_strategy, new_strategy)
     
     # update list of active strategies
     self.s_active.append(new_strategy)
@@ -146,7 +146,7 @@ def lose_adherent(self, strategy_index):
 def record_timestep_data(self, timestep):
     # update strategy cumulative totals
     
-    self.s_counts[self.s_active] += self.s_freqs
+    # self.s_counts[self.s_active] += self.s_freqs
     
     # each game contributes 2 values to the overall pool of results; 
     # (N choose 2) games.
@@ -156,18 +156,18 @@ def record_timestep_data(self, timestep):
     # (discard 1 game of playing yourself)
     
     # total strategy payoff/coop/game1 in matchup w/other N-1 opponents
-    total_s_payoffs     = np.dot(self.s_payoffs,     self.s_freqs) - np.diag(self.s_payoffs) 
+    # total_s_payoffs     = np.dot(self.s_payoffs,     self.s_freqs) - np.diag(self.s_payoffs) 
     total_s_cc_rates    = np.dot(self.s_cc_rates,    self.s_freqs) - np.diag(self.s_cc_rates)
-    total_s_game1_rates = np.dot(self.s_game1_rates, self.s_freqs) - np.diag(self.s_game1_rates)
+    # total_s_game1_rates = np.dot(self.s_game1_rates, self.s_freqs) - np.diag(self.s_game1_rates)
     
     # weight by each strategy's freq; sum for overall payoff/coop/game1
-    avg_s_payoffs     = np.sum(np.dot(total_s_payoffs,     self.s_freqs)) * 1.0/num_contribs
+    # avg_s_payoffs     = np.sum(np.dot(total_s_payoffs,     self.s_freqs)) * 1.0/num_contribs
     avg_s_cc_rates    = np.sum(np.dot(total_s_cc_rates,    self.s_freqs)) * 1.0/num_contribs
-    avg_s_game1_rates = np.sum(np.dot(total_s_game1_rates, self.s_freqs)) * 1.0/num_contribs
+    # avg_s_game1_rates = np.sum(np.dot(total_s_game1_rates, self.s_freqs)) * 1.0/num_contribs
    
-    self.avg_payoff_data[timestep] = avg_s_payoffs;
+    # self.avg_payoff_data[timestep] = avg_s_payoffs;
     self.avg_cc_data[timestep]     = avg_s_cc_rates;
-    self.avg_game1_data[timestep]  = avg_s_game1_rates;
+    # self.avg_game1_data[timestep]  = avg_s_game1_rates;
 # 
 #         avg_single_coop       = time_vec;
 #         avg_single_game1_coop = time_vec;

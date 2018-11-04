@@ -14,25 +14,25 @@ class Pure_One_Game:
         (0,0): 3, # 1DD
     }
 
-    def __init__(self, b1, b2, c):
+    def __init__(self, c, b1, b2=None):
         self.b1 = b1; # benefit coop in Game 1
-        self.b2 = b2; # benefit coop in Game 2
         self.c  = c;   # cost to coop in both games
 
          #player1, player2 payoffs for outcomes 1CC, ..., 1DD, 2CC, ..., 2DD
-        self.p1_payoffs = [b1-c, -c, b1, 0, b2-c, -c, b2, 0];
-        self.p2_payoffs = [b1-c, b1, -c, 0, b2-c, b2, -c, 0];
+        self.p1_payoffs = [b1-c, -c, b1, 0];
+        self.p2_payoffs = [b1-c, b1, -c, 0];
 
 
-
+    @staticmethod
     def to_strategy(num):
         return [int(x) for x in format(num, '04b')]
 
-    def strat_to_str(num):
-        arr = Pure_One_Game.to_strategy(num)
+    @classmethod
+    def strat_to_str(cls, num):
+        arr = cls.to_strategy(num)
         return str(arr)
 
-    def mc_estimate(self, s1, s2, n = 20, initial_state = 0):
+    def mc_estimate(self, s1, s2, n = 30, initial_state = 0):
         '''
             Return avg payoffs when s1 plays s2 and CC rate
         '''
@@ -61,7 +61,7 @@ class Pure_One_Game:
 
 
         # return s1 avg payoff, s2 avg payoff, avg CC ratex
-        return (s1_total_payoff/n, s2_total_payoff/n, cc_rate/n, 1)
+        return (s1_total_payoff/n, s2_total_payoff/n, cc_rate/n, 1.0)
 
 
     def q_estimate(self, s1, s2, initial_state = 0):

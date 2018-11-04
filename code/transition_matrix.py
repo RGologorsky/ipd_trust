@@ -1,3 +1,5 @@
+# TO DO
+
 # transition matrix
 
 def get_stationary_dist(strategy1, strategy2):

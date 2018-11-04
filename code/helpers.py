@@ -1,6 +1,7 @@
-# Helper Functions
+# Helper Functions for the Simulation
+
 import numpy as np
-from game import mc_estimate
+#from game import mc_estimate
 
 # Static methods
 def sigmoid(x):
@@ -19,14 +20,14 @@ def add_row(vec, matrix):
     try:
         return np.r_[matrix,[vec]]
     except Exception as e:
-        print "Adding row error. Row {:}.\n Matrix:\n {:} ".format(vec, matrix)
+        print("Adding row error. Row {:}.\n Matrix:\n {:} ".format(vec, matrix))
         raise(e)
 
 def add_col(vec, matrix):
     try:
         return np.c_[matrix, vec]
     except Exception as e:
-        print "Adding col error. Col {:}.\n Matrix:\n {:} ".format(vec, matrix)
+        print("Adding col error. Col {:}.\n Matrix:\n {:} ".format(vec, matrix))
         raise(e)
 
 def del_row(index, matrix):
@@ -49,16 +50,32 @@ def invent_strategy(self):
     self.invent_index += 1
     return new_strategy
 
-# choose random strategy
-def choose_strategy(self):
-    random_weight = self.get_random_float()
-    for index, freq in enumerate(self.s_freqs):
-        random_weight -= float(freq)/self.N;
+# returns index, chosen with weighted probability from a list
+def choose_one_from_list(wts, random_weight):
+    for index, wt in enumerate(wts):
+        random_weight -= wt;
         if random_weight <= 0:
             return index
 
+# choose random strategy index
+def choose_strategy(self):
+    random_weight = self.N * self.get_random_float()
+    return choose_one_from_list(self.s_freqs, random_weight)
+
 # choose random pair (no replacement) of strategy indices
 def choose_strategy_pair(self):
+    rand1 = self.N * self.get_random_float()
+    s1_index = choose_one_from_list(self.s_freqs, rand1)
+
+    # choose another strategy without replacement
+    freqs_no_replacement = self.s_freqs[:s1_index] + self.s_freqs[s1_index+1:]
+    rand2 = (self.N - self.s_freqs[s1_index]) * self.get_random_float()
+    s2_index = choose_one_from_list(freqs_no_replacement, rand2)
+
+    return (s1_index, s2_index)
+
+# choose random pair (no replacement) of strategy indices
+def slow_choose_strategy_pair(self):
 
     # only one strategy in the population
     if len(self.s_active) == 1:
@@ -71,7 +88,7 @@ def gain_adherent(self, strategy_index):
     try:
         self.s_freqs[strategy_index] += 1
     except Exception as e:
-        print "strategy_index = {:}".format(strategy_index)
+        print("strategy_index = {:}".format(strategy_index))
         self.print_status()
 
         raise(e)

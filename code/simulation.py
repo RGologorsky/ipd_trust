@@ -4,12 +4,14 @@ import time
 from helpers import *
 from printing import *
 
+# @profile
 def simulate_timesteps(self):
 
     start_time = time.time()
     
     # Main Evolution Loop
-    for timestep in xrange(self.T):
+    for timestep in range(self.T):
+        # self.print_status()
 
         # someone with mutates/invents new strategy (must in homogenous population)
         if self.coin_toss(self.mu) or len(self.s_active) == 1:
@@ -17,10 +19,16 @@ def simulate_timesteps(self):
             new_strategy = self.invent_strategy()
             old_strategy_index = self.choose_strategy()
             
+            # keep old strategy number for record
+            old_strategy = self.s_active[old_strategy_index]
+
+
+            # print("mutation: {}->{}".format(new_strategy, self.s_active[old_strategy_index]))
+
             self.lose_adherent(old_strategy_index)
             self.add_strategy(new_strategy);
 
-            self.print_freq_total("after coin toss mu")
+            # self.print_freq_total("after coin toss mu")
             
             
         # someone switches strategies
@@ -35,19 +43,29 @@ def simulate_timesteps(self):
 
             
             if self.coin_toss(imitation_prob):
+
+                # print("imitation {}->{}. learner = {:.2f}, rolemodel = {:.2f}, Prob = {:.2f}".format(
+                #                    self.s_active[s_learner_index], \
+                #                    self.s_active[s_rolemodel_index], \
+                #                    pi_learner,
+                #                    pi_rolemodel,
+                #                     imitation_prob))
+
                 # learner switches to rolemodel strategy
                 self.gain_adherent(s_rolemodel_index)
                 self.lose_adherent(s_learner_index)
 
-                self.print_freq_total("after coin toss imitiation prob")
+                # self.print_freq_total("after coin toss imitiation prob")
 
         
         self.record_timestep_data(timestep);
 
     self.elapsed_time = time.time() - start_time
     self.final_avg_cc_rate = np.mean(self.avg_cc_data)
-    print "Elapsed time: {:.2f} sec".format(self.elapsed_time)
+    self.print_results()
     self.plot_timestep_data()
+
+    return self.final_avg_cc_rate
 
 
 

@@ -3,7 +3,10 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 def plot_timestep_data(self):
-    print "plotting"
+    if not self.do_plots:
+        return
+
+    print("plotting")
 
     time_vec = range(self.T)
    
@@ -22,6 +25,17 @@ def plot_timestep_data(self):
         return 0 if x == 0 else "10^({%d})" % int(np.log10(x))
 
     ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2e'))
+    plt.show()
+
+def plot(xs, ys, title, xlabel, ylabel):
+    fig = plt.figure(1)
+    fig.clf()
+
+    ax1 = plt.subplot(2,2,1);
+    ax1.plot(xs, ys); 
+    ax1.set_title(title);
+    ax1.set_xlabel(xlabel);
+    ax1.set_ylabel(ylabel);
     plt.show()
 
     # plt.subplot(2,2,2); 

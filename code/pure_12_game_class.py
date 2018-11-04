@@ -19,7 +19,7 @@ class Pure_12_Game:
         (2,0,0): 7, # 2DD
     }
 
-    def __init__(self, b1, b2, c):
+    def __init__(self, c, b1, b2):
         self.b1 = b1; # benefit coop in Game 1
         self.b2 = b2; # benefit coop in Game 2
         self.c  = c;   # cost to coop in both games
@@ -29,12 +29,13 @@ class Pure_12_Game:
         self.p2_payoffs = [b1-c, b1, -c, 0, b2-c, b2, -c, 0];
 
 
-
+    @staticmethod
     def to_strategy(num):
         return [int(x) for x in format(num, '012b')]
 
-    def strat_to_str(num):
-        arr = Pure_12_Game.to_strategy(num)
+    @classmethod
+    def strat_to_str(cls, num):
+        arr = cls.to_strategy(num)
         return str(arr[0:4])   + "," + \
                 str(arr[4:8])  + ". Transition: " + \
                 str(arr[8:12])

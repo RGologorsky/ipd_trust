@@ -1,5 +1,7 @@
 # printing
 
+import numpy as np
+
 def print_num_s_active(self):
     print("No. S_Active: {:}".format(len(self.s_active)))
 
@@ -9,8 +11,11 @@ def print_freq_total(self, msg):
         print(msg)
         print("Unusual: Total Freq: {:}".format(sum(self.s_freqs)))
 
-def print_status(self):
-    print("#### STATUS ####")
+def print_status(self, timestep):
+    if self.round_result == (-1, -1):
+        return
+
+    print("#### Round {:} STATUS ####".format(timestep))
 
     self.print_num_s_active()
     print("s_active", self.s_active)
@@ -26,6 +31,11 @@ def print_status(self):
     print("#### END STATUS ####")
 
 def print_results(self):
-    print("Overall Avg. CC rate: {:.2f}. Elapsed time: {:.2f} sec"\
-            .format(self.final_avg_cc_rate, self.elapsed_time))
+    print("b1 = {:}. T = 10^({:}). Overall Avg. CC rate: {:.2f}. Elapsed time: {:.2f} sec"\
+            .format(self.game.b1, int(np.log10(self.T)), self.final_avg_cc_rate, self.elapsed_time))
 
+    # most abundance
+    ind = np.argpartition(self.s_counts, -4)[-4:]
+    ind = ind[np.argsort(-1 * self.s_counts[ind])]
+    print("most abundant strategies: strat = {:} s_counts {:}".format(ind, self.s_counts[ind]))
+    print("abundance ALL-D: {:}".format(self.s_counts[0]))

@@ -28,10 +28,10 @@ class Pure_12_Game:
         self.p1_payoffs = [b1-c, -c, b1, 0, b2-c, -c, b2, 0];
         self.p2_payoffs = [b1-c, b1, -c, 0, b2-c, b2, -c, 0];
 
-
     @staticmethod
     def to_strategy(num):
-        return [int(x) for x in format(num, '012b')]
+        # 0 -> epsilon, 1 -> 1 - epsilon
+        return [int(x)*(1-2*self.eps)+self.eps for x in format(num, '012b')]
 
     @classmethod
     def strat_to_str(cls, num):

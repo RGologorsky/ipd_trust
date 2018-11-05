@@ -12,18 +12,29 @@ from plotting import plot
 # game = Pure_16_Game(c=1.0, b1=1.9, b2=1.2)
 T = 10**5
 
-game = Pure_One_Game(c=1.0, b1=1.9, eps=0.01)
+game = Pure_One_Game(c=1.0, b1=20.0, eps=0.01)
 new_simulation = Sim(T=T, game = game, do_plots = False)
 new_simulation.init_strategy_population(s_initial = 0)
 
-#new_simulation.simulate_timesteps()
+new_simulation.simulate_timesteps()
+plot(np.arange(new_simulation.T), new_simulation.avg_cc_data, \
+    title = "Prob[C] over Time", xlabel = "Timestep", ylabel = "Prob[C]")
 
+print(new_simulation.avg_cc_data)
+print("avg ", np.mean(new_simulation.avg_cc_data))
 
+# file = open("avg_c_data.txt","w") 
+# file.write("avg c data") 
 
-(b1_list, cc_list) = test_cc_vs_b(Pure_One_Game, T=T, b1_start=1, b1_end=3, \
-                                    num_test_pts=5)
+# for i in range(int(T/20)):
+#     last_index = 20 * i
+#     file.write(str(new_simulation.avg_cc_data[last_index:last_index+20]))
+# file.close() 
 
-plot(b1_list, cc_list, title = "CC v. b1 value", xlabel = "b1 value", ylabel = "CC")
+# (b1_list, cc_list) = test_cc_vs_b(Pure_One_Game, T=10**5, b1_start=1, b1_end=3, \
+#                                     num_test_pts=5)
+
+# plot(b1_list, cc_list, title = "CC v. b1 value", xlabel = "b1 value", ylabel = "CC")
 
 # # Game settings, parameters
 # from init_game import *

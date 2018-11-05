@@ -15,9 +15,9 @@ def plot_timestep_data(self):
     
     ax1 = plt.subplot(2,2,1);
     ax1.plot(time_vec, self.avg_cc_data); 
-    ax1.set_title('Evolution of Prob[CC] over Time');
+    ax1.set_title('Evolution of Cooperation over Time');
     ax1.set_xlabel('Timestep');
-    ax1.set_ylabel('Avg. Prob[CC]');
+    ax1.set_ylabel('Avg. Prob[C]');
 
 
     @ticker.FuncFormatter

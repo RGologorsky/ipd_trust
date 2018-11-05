@@ -31,7 +31,7 @@ class Pure_16_Game:
 
     @staticmethod
     def to_strategy(num):
-        return [int(x) for x in format(num, '016b')]
+        return [int(x)*(1-2*self.eps)+self.eps for x in format(num, '016b')]
 
     @classmethod
     def strat_to_str(cls, num):

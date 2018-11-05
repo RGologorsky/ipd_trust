@@ -22,36 +22,15 @@ class Sim:
         self.s_active = [s_initial]
         self.s_freqs  = [self.N]
 
-        new_s_payoffs, _, new_s_cc_rates, new_s_game1_rates = \
-            self.game.mc_estimate(s_initial, s_initial)
+        new_s_payoff, _, new_s_cc_rate, _, new_s_game1_rate = \
+            self.game.get_stats(s_initial, s_initial)
 
         # matrix of current strategy payoffs against each other
-        self.s_payoffs     = new_s_payoffs     * np.ones((1,1))
-        self.s_cc_rates    = new_s_cc_rates    * np.ones((1,1))
-        self.s_game1_rates = new_s_game1_rates * np.ones((1,1))
+        self.s_payoffs     = new_s_payoff     * np.ones((1,1))
+        self.s_cc_rates    = new_s_cc_rate    * np.ones((1,1))
+        self.s_game1_rates = new_s_game1_rate * np.ones((1,1))
 
         self.hist = ""
-
-
-    def reset_game(self, game, s_initial=0):
-
-        # reset random floats
-        self.random_floats_index = 0;
-        self.invent_index        = 0;
-
-        # Game: encapsulates b,c values, rules, strategy space.
-        self.game = game
-        self.max_num_strategies = game.max_num_strategies
-
-        # cumulative strategy counts
-        self.s_counts = np.zeros(self.max_num_strategies) 
-
-        # time data vectors store strategy population data at each time step
-        self.avg_cc_data     = np.zeros(self.T);
-        self.avg_payoff_data = np.zeros(self.T); 
-        self.avg_game1_data  = np.zeros(self.T);
-
-        self.init_strategy_population(s_initial)
 
 
     def __init__(self, T, game, do_plots=False):
@@ -68,8 +47,7 @@ class Sim:
         self.N    = 100;   # population size
         self.beta = 2;     # selection pressure
         self.mu   = 0.01;  # mutation probability
-        self.eps  = 0;     # noise
-
+        
         # cumulative strategy counts
         self.s_counts = np.zeros(self.max_num_strategies) 
 
@@ -100,7 +78,7 @@ class Sim:
             Total: 2T + 2 (1-mu)T = (4-2*mu) T
         """
 
-        self.random_floats       = np.random.random(size=self.T * int(5-2*self.mu))
+        self.random_floats       = np.random.random(size=int(self.T *(4-1*self.mu)))
         self.invented_strategies = np.random.randint(self.max_num_strategies, \
                                                      size=int(2*self.mu*self.T))
 

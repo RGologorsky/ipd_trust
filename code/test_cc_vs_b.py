@@ -8,7 +8,7 @@ from pure_12_game_class import Pure_12_Game
 from pure_16_game_class import Pure_16_Game
 from pure_one_game_class import Pure_One_Game
 
-def test_cc_vs_b(cls, T=10**5, b1_start=1, b1_end=3, num_test_pts=5):
+def test_cc_vs_b(cls, T=10**7, b1_start=1, b1_end=3, num_test_pts=5):
 
     b1_list = np.linspace(b1_start, b1_end, num_test_pts)
     cc_list = np.zeros(num_test_pts)

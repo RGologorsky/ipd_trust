@@ -43,7 +43,7 @@ def get_random_float(self):
     return random_float
 
 def coin_toss(self, p):
-    return (self.get_random_float() <= self.mu)
+    return (self.get_random_float() <= p)
 
 def invent_strategy(self):
     new_strategy = self.invented_strategies[self.invent_index];
@@ -57,36 +57,36 @@ def choose_one_from_list(wts, random_weight):
         if random_weight <= 0:
             return index
 
+    print("Error! choose one from list failed")
+    raise(Exception)
+
 # choose random strategy index
 def choose_strategy(self):
-    random_weight = self.N * self.get_random_float()
-    return choose_one_from_list(self.s_freqs, random_weight)
+    random_weight = self.get_random_float()
+    return choose_one_from_list(self.s_freqs, self.N * random_weight)
 
-# choose random pair (no replacement) of strategy indices
+# choose two individuals,  learner & rolemodel, return their strategy indices
 def choose_strategy_pair(self):
-    rand1 = self.N * self.get_random_float()
-    s1_index = choose_one_from_list(self.s_freqs, rand1)
 
-    # choose another strategy without replacement
-    freqs_no_replacement = self.s_freqs[:s1_index] + self.s_freqs[s1_index+1:]
-    rand2 = (self.N - self.s_freqs[s1_index]) * self.get_random_float()
-    s2_index = choose_one_from_list(freqs_no_replacement, rand2)
+    # choose learner's strategy
+    rand1 = self.get_random_float()
+    s1_index = choose_one_from_list(self.s_freqs, self.N * rand1)
 
-    return (s1_index, s2_index)
+    # choose rolemodel's strategy, without replacement
+    freqs_no_replacement = self.s_freqs[:]
+    freqs_no_replacement[s1_index] -= 1
 
-# choose random pair (no replacement) of strategy indices
-def slow_choose_strategy_pair(self):
+    rand2 =  self.get_random_float()
+    s2_index = choose_one_from_list(freqs_no_replacement, (self.N - 1) * rand2)
 
-    # only one strategy in the population
-    if len(self.s_active) == 1:
-        return -1
+    # choose which individual is learner/role model
+    return (s1_index, s2_index) #if rand1 < rand2 else (s2_index, s1_index)
 
-    s_weights = [s_freq/float(self.N) for s_freq in self.s_freqs]
-    return np.random.choice(len(self.s_active),size=2,replace=False, p=s_weights)
 
 def gain_adherent(self, strategy_index):
     try:
         self.s_freqs[strategy_index] += 1
+
     except Exception as e:
         print("strategy_index = {:}".format(strategy_index))
         self.print_status()
@@ -99,6 +99,7 @@ def get_avg_strategy_payoff(self, strategy_index):
     all_payoff  = np.dot(self.s_payoffs[strategy_index], self.s_freqs)
     self_payoff = self.s_payoffs[strategy_index,strategy_index];
 
+    # avg payoff against N-1 other individuals in the current population
     avg_payoff = (all_payoff - self_payoff) * 1.0/(self.N-1);
     return avg_payoff
 
@@ -113,24 +114,24 @@ def add_strategy(self, new_strategy):
         return
         
     # get new strategy's stats against currently active strategies
-    [new_s_payoffs, strat_payoffs, new_s_cc_rates, new_s_game1_rates] = \
-        zip(*[self.game.mc_estimate(new_strategy, strat) for strat in self.s_active])
+    [new_s_payoffs, strat_payoffs, new_s_cc_rates, strat_cc_rates, game1_rates] = \
+        zip(*[self.game.get_stats(new_strategy, strat) for strat in self.s_active])
 
-    s_self_payoff, _, s_self_cc_rate, s_self_game1_rate = \
-        self.game.mc_estimate(new_strategy, new_strategy)
+    s_self_payoff, _, s_self_cc_rate, _, s_self_game1_rate = \
+        self.game.get_stats(new_strategy, new_strategy)
     
     # update list of active strategies
     self.s_active.append(new_strategy)
     self.s_freqs.append(1)
 
     # add this strategy's stats to the matrix containing active strategy stats
-    self.s_payoffs     = add_row(new_s_payoffs, self.s_payoffs)
+    self.s_payoffs     = add_row(new_s_payoffs,  self.s_payoffs)
     self.s_cc_rates    = add_row(new_s_cc_rates, self.s_cc_rates)
-    self.s_game1_rates = add_row(new_s_game1_rates, self.s_game1_rates)
+    self.s_game1_rates = add_row(game1_rates,    self.s_game1_rates)
 
     col1 = list(strat_payoffs)
-    col2 = list(new_s_cc_rates)
-    col3 = list(new_s_game1_rates)
+    col2 = list(strat_cc_rates)
+    col3 = list(game1_rates)
     
     col1.append(s_self_payoff)
     col2.append(s_self_cc_rate)
@@ -163,8 +164,15 @@ def lose_adherent(self, strategy_index):
 def record_timestep_data(self, timestep):
     # update strategy cumulative totals
     
-    # self.s_counts[self.s_active] += self.s_freqs
+    self.s_counts[self.s_active] += self.s_freqs
     
+    if self.round_result == (-1,-1):
+        # print("timestep ", timestep)
+        # print("prior avg cc", self.avg_cc_data[timestep - 1])
+        # print("all prior", self.avg_cc_data[:timestep])
+        self.avg_cc_data[timestep] = self.avg_cc_data[timestep - 1]
+        return
+
     # each game contributes 2 values to the overall pool of results; 
     # (N choose 2) games.
     num_contribs = self.N * (self.N - 1);
@@ -174,12 +182,12 @@ def record_timestep_data(self, timestep):
     
     # total strategy payoff/coop/game1 in matchup w/other N-1 opponents
     # total_s_payoffs     = np.dot(self.s_payoffs,     self.s_freqs) - np.diag(self.s_payoffs) 
-    total_s_cc_rates    = np.dot(self.s_cc_rates,    self.s_freqs) - np.diag(self.s_cc_rates)
+    total_s_cc_rates    = np.matmul(self.s_cc_rates,    self.s_freqs) - np.diag(self.s_cc_rates)
     # total_s_game1_rates = np.dot(self.s_game1_rates, self.s_freqs) - np.diag(self.s_game1_rates)
     
     # weight by each strategy's freq; sum for overall payoff/coop/game1
     # avg_s_payoffs     = np.sum(np.dot(total_s_payoffs,     self.s_freqs)) * 1.0/num_contribs
-    avg_s_cc_rates    = np.sum(np.dot(total_s_cc_rates,    self.s_freqs)) * 1.0/num_contribs
+    avg_s_cc_rates    = np.sum(np.dot(total_s_cc_rates,    self.s_freqs))/num_contribs
     # avg_s_game1_rates = np.sum(np.dot(total_s_game1_rates, self.s_freqs)) * 1.0/num_contribs
    
     # self.avg_payoff_data[timestep] = avg_s_payoffs;

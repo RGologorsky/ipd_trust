@@ -1,6 +1,6 @@
-# Documentation
+# Code Documentation
 
-# Game Mechanics
+## Game Mechanics
 
 Each specific game is implemented in its own class:
 * **S_02_Class** implements IPD over the 2-dim space of reactive strategies (p,q). 
@@ -23,21 +23,13 @@ Each specific game class has the following structure:
  1. **get_stationary_dist(self, s1, s2, eps=1e-15)**. This function takes in two strategies, s1 and s2, generates the corresponding transition matrix, and returns the resulting stationary distribution (to the specified precision *eps*).
  2. **get_payoffs(self, s1, s2)**. This function takes in two strategies, gets the stationary distribution over game states, and returns the resulting average payoff for each strategy.
 
-# Stochastic Dynamics (invader fixation probability)
+## Stochastic Dynamics
 
 The invader fixation probability is calculated in *stochastic_dynamics.py*. This file defines:
 
 1. **get_prob_imitation(beta, pi_learner, pi_rolemodel)**. This calculates the probability that an individual with the learner strategy will switch to the rolemodel's strategy. It is currently implemented using the Fermi function, with selection pressure beta, according to Traulsen et al (2006).
 
-2. **get_prob_invader_decr(j, N, beta, pi_invader, pi_host)**. This calculates T <sub>j</sub><sup>-</sup>, the probability that the number of invaders in the population decreases from j to j - 1, where the total population size is N.
-3. **get_prob_invader_incr(j, N, beta, pi_invader, pi_host)**. This calculates the probability that the number of invaders in the population increases from j to j - 1, where the total population size is N.
-4. **get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates T_j
-
-    # no self-interactions
-    pi_invader   = pi_yy * (j-1)/(N-1.0) + pi_yx * (N-j)/(N-1.0)
-    pi_host      = pi_xy * j/(N-1.0)     + pi_xx * (N-j-1)/(N-1.0)
-
-    return get_prob_invader_decr(j, N, beta, pi_invader, pi_host)/get_prob_invader_incr(j, N, beta, pi_invader, pi_host)
-
-def get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
-    summation = 1
+2. **get_prob_invader_decr(j, N, beta, pi_invader, pi_host)**. This calculates $T_j^+$, the probability that the number of invaders in the population decreases from *j* to *j-1*, where the total population size is *N* and there are no self-interactions.
+3. **get_prob_invader_incr(j, N, beta, pi_invader, pi_host)**. This calculates $T_j^+$, the probability that the number of invaders in the population increases from *j* to *j-1*, where the total population size is *N*.
+4. **get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates the ratio $\frac{T_j^-}{T_j^+}$T  where there are *j* invaders in a population of size *N*, host vs. host average payoff is pi_xx, invader vs. invader average payoff is pi_yy, and selection pressure is *beta*.
+5. **get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates the probablity that a single mutant invader will fixate in the population. 

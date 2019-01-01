@@ -3,18 +3,22 @@ from class_two import Two_Game
 
 class S_12_Game(Two_Game):
 
-    # Calculating Game Transitions, specific payoffs between strategies.
+    strat_len = 12
+    ALLD = (0,0,0,0, 0,0,0,0, 1,1,1,1)
 
-    # 8 states, ranging from 0 to 7, corresponding to 1CC to 2DD.
-    # Strategies in [0,1]^16
+    # environment state transition probability given each player's state preference
+    f = lambda a, b: a * b
 
     def __init__(self, c, b1, b2):
-        self.strat_len = 12
-        self.ALLD = (0,0,0,0, 0,0,0,0, 1,1,1,1)
+        self.c = c
+        self.b1 = b1
+        self.b2  = b2
 
-        super().__init__(c, b1, b2)
+        self.set_payoffs()
 
-
+    def set_payoffs(self):
+        self.p1_payoffs = np.asarray([b1-c, -c, b1, 0, b2-c, -c, b2, 0]);
+        self.p2_payoffs = np.asarray([b1-c, b1, -c, 0, b2-c, b2, -c, 0]);
 
     def generate_transition_matrix(self, s1, s2):
         (p1cc, p1cd, p1dc, p1dd, p2cc, p2cd, p2dc, p2dd, xcc, xcd, xdc, xdd) = s1

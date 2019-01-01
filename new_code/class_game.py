@@ -2,12 +2,6 @@ import numpy as np
 
 class Game:
 
-    def __init__(self, c, b1, eps=0.005):
-        self.b1 = b1; # benefit coop in Game 1
-        self.c  = c;   # cost to coop in both games
-
-        self.ALLD = (0,0)
-
     def get_stationary_dist(self, s1, s2, eps=1e-15):
         Q = self.generate_transition_matrix(s1, s2)
 
@@ -41,8 +35,9 @@ class Game:
 
         return (s1_payoff, s2_payoff)
 
-    # printing
+    # each specifc game class must implement these two methods
+    def generate_transition_matrix(self, s1, s2):
+        pass
 
-    def strat_to_str(self, num):
-        arr = self.to_strategy(num)
-        return str(arr)
+    def set_payoffs(self):
+        pass

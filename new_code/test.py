@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import time
 # choose game
 game = Reactive_Game(c=1.0, b1=10)
-num_repeats = 200
+num_repeats = 500
 
 # Parameters
 params_dict = {
@@ -36,16 +36,41 @@ print("Num. Invasion Attempts Distribution: mean = {:.2f}, sample sd = {:2f}".fo
 
 # print("Strategies: ", strategies)
 print("Num Invasion Attempts: ", num_invasion_attempts)
+
 # Plot
-ps, qs = zip(*strategies)
+long_invasion = list(
+					strategy 
+					for index, strategy in enumerate(strategies) \
+					if num_invasion_attempts[index] >= mean + 1.0 * sample_sd
+				)
+
+short_invasion = list(
+					strategy 
+					for index, strategy in enumerate(strategies) \
+					if num_invasion_attempts[index] <= mean - 1.0 * sample_sd
+				)
+
+normal_invasion = list(
+					strategy 
+					for index, strategy in enumerate(strategies) \
+					if ((num_invasion_attempts[index] > mean - 1.0 * sample_sd) and 
+						(num_invasion_attempts[index] < mean + 1.0 * sample_sd))
+
+				)
 
 fig, ax = plt.subplots()
-ax.scatter(ps, qs)
+
+for lst, color in [(long_invasion, "red"), (short_invasion, "lawngreen"), (normal_invasion, "black")]:
+	if len(lst) > 0:
+		ps, qs     = zip(*lst)
+		ax.scatter(ps, qs, s = 10, color=color)
 
 # label each point w/num. invasions
-for i, strategy in enumerate(strategies):
-	num_attempts = num_invasion_attempts[i]
-	ax.annotate(str(num_attempts), strategy)
+do_label = False
+if do_label:
+	for i, strategy in enumerate(strategies):
+		num_attempts = num_invasion_attempts[i]
+		ax.annotate(str(num_attempts), strategy)
 
 
 ax.set_title('Successful ALL-D Invader Strategies')

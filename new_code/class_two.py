@@ -14,14 +14,3 @@ class Two_Game(Game):
         # player1, player2 payoffs for outcomes CC, CD, DC, and DD.
         self.p1_payoffs = np.asarray([b1-c, -c, b1, 0, b2-c, -c, b2, 0]);
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0, b2-c, b2, -c, 0]);
-
-
-    def generate_transition_matrix(self, s1, s2):
-        pass
-
-
-    def strat_to_str(self, num):
-        arr = self.to_strategy(num)
-        return str(arr[0:4])   + "," + \
-                str(arr[4:8])  + ". Transition: " + \
-                str(arr[8:])

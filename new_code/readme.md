@@ -1,1 +1,43 @@
-# TO DO
+# Documentation
+
+# Game Mechanics
+
+Each specific game is implemented in its own class:
+* **S_02_Class** implements IPD over the 2-dim space of reactive strategies (p,q). 
+* **S_04_Class** implements IPD over the 4-dim space of memory-1 strategies (p_cc, p_cd, p_dc, p_dd).
+* **S_12_Class** implements IPD over the 12-dim space of reactive two-game strategies (p_1cc, p_1cd, p_1dc, p_1dd, q_1cc, q_1cd, q_1dc, q_1dd, x_cc, x_cd, x_dc, x_dd)
+* **S_16_Class** implements IPD over the 16-dim space of memory-1 two-game strategies (p_1cc, p_1cd, p_1dc, p_1dd, q_1cc, q_1cd, q_1dc, q_1dd, x_1cc, x_1cd, x_1dc, x_1dd, x_2cc, x_2cd, x_2dc, x_2dd).
+
+Each specific game class has the following structure:
+1. Class variables: 
+	- **length of a strategy in this game** (e.g. strat_len = 2 for reactive strategies (p, q) and strat_len = 4 for memory-1 strategies (p_cc, p_cd, p_dc, p_dd).
+	- **definition of strategy ALLD** (e.g. ALLD = (0,0) or ALLD = (0,0,0,0)).
+
+
+2. Instance variables: **the values to use in the payoff matrix**, such as *c=1* and *b=10* or *c=1*,*b1=10*, and *b2=5*. These are set during initialization, and are used to define each player's payoff.
+3. Instance Methods.
+	* **set_payoffs(self)**. This function uses the payoff matrix values to set player 1 and player 2's payoff values for each game state.
+	* **generate_transition_matrix(self, s1, s2)**. This function takes in two strategies and returns the corresponding transition matrix.
+
+ Each specific game inherits from the general **Game class** two methods:
+ 1. **get_stationary_dist(self, s1, s2, eps=1e-15)**. This function takes in two strategies, s1 and s2, generates the corresponding transition matrix, and returns the resulting stationary distribution (to the specified precision *eps*).
+ 2. **get_payoffs(self, s1, s2)**. This function takes in two strategies, gets the stationary distribution over game states, and returns the resulting average payoff for each strategy.
+
+# Stochastic Dynamics (invader fixation probability)
+
+The invader fixation probability is calculated in *stochastic_dynamics.py*. This file defines:
+
+1. **get_prob_imitation(beta, pi_learner, pi_rolemodel)**. This calculates the probability that an individual with the learner strategy will switch to the rolemodel's strategy. It is currently implemented using the Fermi function, with selection pressure beta, according to Traulsen et al (2006).
+
+2. **get_prob_invader_decr(j, N, beta, pi_invader, pi_host)**. This calculates T <sub>j</sub><sup>-</sup>, the probability that the number of invaders in the population decreases from j to j - 1, where the total population size is N.
+3. **get_prob_invader_incr(j, N, beta, pi_invader, pi_host)**. This calculates the probability that the number of invaders in the population increases from j to j - 1, where the total population size is N.
+4. **get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates T_j
+
+    # no self-interactions
+    pi_invader   = pi_yy * (j-1)/(N-1.0) + pi_yx * (N-j)/(N-1.0)
+    pi_host      = pi_xy * j/(N-1.0)     + pi_xx * (N-j-1)/(N-1.0)
+
+    return get_prob_invader_decr(j, N, beta, pi_invader, pi_host)/get_prob_invader_incr(j, N, beta, pi_invader, pi_host)
+
+def get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
+    summation = 1

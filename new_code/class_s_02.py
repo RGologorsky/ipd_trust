@@ -2,26 +2,19 @@ import numpy as np
 
 from class_game import Game
 
-class Reactive_Game(Game):
+class S_2_Game(Game):
 
-    # Calculating Game Transitions, specific payoffs between strategies.
-
-    # 8 states, ranging from 0 to 7, corresponding to 1CC to 2DD.
-    # Strategies in [0,1]^16
-
+    strat_len = 2
+    ALLD = (0, 0)
 
     def __init__(self, c, b1):
-        super().__init__(c, b1)
+        self.c = c
+        self.b1 = b1
+        self.set_payoffs()
 
-        self.strat_len = 2
-
-        # player1, player2 payoffs for outcomes CC, CD, DC, and DD.
+    def set_payoffs(self):
         self.p1_payoffs = np.asarray([b1-c, -c, b1, 0]);
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0]);
-
-
-        self.ALLD = (0.005,0.005)
-
 
     def generate_transition_matrix(self, s1, s2):
 

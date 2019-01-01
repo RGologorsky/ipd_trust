@@ -1,4 +1,8 @@
 
+# strategy to string
+def strat_to_str(strat):
+	return ','.join(["{:.3f}".format(num) for num in strat])
+
 # Plotting Helpers
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker

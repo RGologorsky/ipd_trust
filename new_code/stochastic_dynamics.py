@@ -1,4 +1,5 @@
 import numpy as np
+np.seterr(over='raise')
 
 # Probability Helpers
 def get_prob_imitation(beta, pi_learner, pi_rolemodel):
@@ -23,12 +24,18 @@ def get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
 
 def get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
     summation = 1
-    curr_ln_product = 0
+    curr_product = 1
 
     for k in range(1, N):
-        new_term = get_invader_decr_incr_ratio(k, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)
-        curr_ln_product += np.log(new_term)
-        summation += np.exp(curr_ln_product)
+        try:
+            new_term = get_invader_decr_incr_ratio(k, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)
+            curr_product *= new_term
+            summation += curr_product
+
+        except FloatingPointError:
+            # print("Overflow in denominator => prob of invasion is nil.")
+            return 0
+
 
     #print("N = {}, beta = {}, pi_xx = {:.2f}, pi_xy = {:.2f}, pi_yx = {:.2f}, pi_yy = {:.2f}, prob: {:.2f}".format(N, beta, pi_xx, pi_xy, pi_yx, pi_yy, 1.0/summation))
     return 1.0/summation

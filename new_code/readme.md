@@ -2,7 +2,7 @@
 
 ## Game Mechanics
 
-Each specific game is implemented in its own class:
+I implemented 4 game types. Each game type is implemented in its own class:
 * **S_02_Class** implements IPD over the 2-dim space of reactive strategies (p,q). 
 * **S_04_Class** implements IPD over the 4-dim space of memory-1 strategies (p_cc, p_cd, p_dc, p_dd).
 * **S_12_Class** implements IPD over the 12-dim space of reactive two-game strategies (p_1cc, p_1cd, p_1dc, p_1dd, q_1cc, q_1cd, q_1dc, q_1dd, x_cc, x_cd, x_dc, x_dd)
@@ -33,3 +33,17 @@ The invader fixation probability is calculated in *stochastic_dynamics.py*. This
 3. **get_prob_invader_incr(j, N, beta, pi_invader, pi_host)**. This calculates $T_j^+$, the probability that the number of invaders in the population increases from *j* to *j-1*, where the total population size is *N*.
 4. **get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates the ratio $\frac{T_j^-}{T_j^+}$T  where there are *j* invaders in a population of size *N*, host vs. host average payoff is pi_xx, invader vs. invader average payoff is pi_yy, and selection pressure is *beta*.
 5. **get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates the probablity that a single mutant invader will fixate in the population. 
+
+## Simulation
+
+In *simulation.py*, I simulate the occurrence of (rare) mutations until the host strategy is invaded or until the maximum number of mutants is generated.
+The file contains the following functions:
+
+1. **generate_pure_strategy_mutants(num_mutants, strat_len, eps)**. This function generates an array of mutants with randomly generated pure strategies (i.e. cooperate/defect probabilities are eps/1-eps).
+
+2. **generate_stochastic_strategy_mutants(num_mutants, strat_len, eps)**. This function generates an array of mutants with randomly generated stochastic strategies (i.e. cooperate/defect probabilities are drawn from Unif(eps,1-eps)).
+
+3. **simulate_invasion(params_dict)**. This function simulates the occurrence of random mutants probabilistically taking over the host strategy. Specifically, we stars with a homogeneous population where everyone is playing the host strategy, and we generate mutants until one of them takes over the host strategy or until the maximum number of mutants is generated. If a mutant successfully invades, the function returns the successful mutant strategy and the number of invasion attempts; otherwise, the function returns False.
+    
+4. **get_invasion_distr(num_trials, params_dict)**. This function simulates invasion of the host population several times in order to obtain a distribution over the types of mutants that successfully invade and over the number of invasion attempts until success.
+

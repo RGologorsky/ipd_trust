@@ -13,6 +13,9 @@ class S_2_Game(Game):
         self.set_payoffs()
 
     def set_payoffs(self):
+        b1 = self.b1
+        c = self.c
+
         self.p1_payoffs = np.asarray([b1-c, -c, b1, 0]);
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0]);
 
@@ -23,7 +26,7 @@ class S_2_Game(Game):
 
         return np.asarray([
             [pc*qc, pc*(1-qc), (1-pc)*qc, (1-pc)*(1-qc)],
-            [pc*qd, pc*(1-qd), (1-pc)*qd, (1-pc)*(1-qd)],
             [pd*qc, pd*(1-qc), (1-pd)*qc, (1-pd)*(1-qc)],
+            [pc*qd, pc*(1-qd), (1-pc)*qd, (1-pc)*(1-qd)],
             [pd*qd, pd*(1-qd), (1-pd)*qd, (1-pd)*(1-qd)]
         ]);

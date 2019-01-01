@@ -15,6 +15,9 @@ class S_4_Game(Game):
 
     # player1, player2 payoffs for outcomes CC, CD, DC, and DD.
     def set_payoffs(self):
+        b1 = self.b1
+        c = self.c
+        
         self.p1_payoffs = np.asarray([b1-c, -c, b1, 0]);
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0]);
 

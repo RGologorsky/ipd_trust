@@ -1,10 +1,10 @@
 import numpy as np
-from class_two import Two_Game
 
-class S_16_Game(Two_Game):
+from class_game import Game
+
+class S_16_Game(Game):
 
     strat_len = 16
-    ALLD = (0,0,0,0, 0,0,0,0, 1,1,1,1, 1,1,1,1)
 
     # environment state transition probability given each player's state preference
     f = lambda a, b: a * b
@@ -17,6 +17,10 @@ class S_16_Game(Two_Game):
         self.set_payoffs()
 
     def set_payoffs(self):
+        b1 = self.b1
+        b2 = self.b2
+        c = self.c
+
         self.p1_payoffs = np.asarray([b1-c, -c, b1, 0, b2-c, -c, b2, 0]);
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0, b2-c, b2, -c, 0]);
 

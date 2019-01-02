@@ -14,7 +14,7 @@ import time
 # choose game
 game = S_2_Game(c=1.0, b1=10)
 ALLD = (0.005, 0.005)
-num_repeats = 10
+num_repeats = 2000
 
 # Parameters
 params_dict = {
@@ -62,7 +62,7 @@ normal_invasion = list(
 
 fig, ax = plt.subplots()
 
-for lst, color in [(long_invasion, "red"), (short_invasion, "lawngreen"), (normal_invasion, "black")]:
+for lst, color in [(long_invasion, "red"), (short_invasion, "magenta"), (normal_invasion, "black")]:
 	if len(lst) > 0:
 		ps, qs     = zip(*lst)
 		ax.scatter(ps, qs, s = 10, color=color)

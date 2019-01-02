@@ -29,9 +29,9 @@ The invader fixation probability is calculated in *stochastic_dynamics.py*. This
 
 1. **get_prob_imitation(beta, pi_learner, pi_rolemodel)**. This calculates the probability that an individual with the learner strategy will switch to the rolemodel's strategy. It is currently implemented using the Fermi function, with selection pressure beta, according to Traulsen et al (2006).
 
-2. **get_prob_invader_decr(j, N, beta, pi_invader, pi_host)**. This calculates $T_j^+$, the probability that the number of invaders in the population decreases from *j* to *j-1*, where the total population size is *N* and there are no self-interactions.
-3. **get_prob_invader_incr(j, N, beta, pi_invader, pi_host)**. This calculates $T_j^+$, the probability that the number of invaders in the population increases from *j* to *j-1*, where the total population size is *N*.
-4. **get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates the ratio $\frac{T_j^-}{T_j^+}$T  where there are *j* invaders in a population of size *N*, host vs. host average payoff is pi_xx, invader vs. invader average payoff is pi_yy, and selection pressure is *beta*.
+2. **get_prob_invader_decr(j, N, beta, pi_invader, pi_host)**. This calculates **T<sub>j</sub><sup>-</sup>**, the probability that the number of invaders in the population decreases from *j* to *j-1*, where the total population size is *N* and there are no self-interactions.
+3. **get_prob_invader_incr(j, N, beta, pi_invader, pi_host)**. This calculates **T<sub>j</sub><sup>+</sup>**, the probability that the number of invaders in the population increases from *j* to *j-1*, where the total population size is *N*.
+4. **get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates the ratio **T<sub>j</sub><sup>-</sup>**/**T<sub>j</sub><sup>+</sup>**  where there are *j* invaders in a population of size *N*, host vs. host average payoff is pi_xx, invader vs. invader average payoff is pi_yy, and selection pressure is *beta*.
 5. **get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)**. This calculates the probablity that a single mutant invader will fixate in the population. 
 
 ## Simulation

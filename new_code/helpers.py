@@ -1,5 +1,5 @@
 import numpy as np
-
+import json
 
 # generate binary 0/1 pure strategies, rescale to eps/1-eps
 def generate_pure_strategy_mutants(num_mutants, strat_len, eps):
@@ -48,29 +48,22 @@ def add_titlebox(ax, text):
         transform=ax.transAxes,
         bbox=dict(facecolor='white', alpha=0.6))
         #,fontsize=12.5)
-    return ax
 
-def plot_line(xs, ys, xlabel, ylabel, title, titlebox="", point_size=10):
-    fig, ax = plt.subplots()
+def add_line_plot(ax, xs, ys, xlabel, ylabel, title, text="", point_size=10):
     ax.plot(xs, ys, marker='o', color='b')
     ax.set_title(title)
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
+    ax.set_ylabel(ylabel) 
 
-    add_titlebox(ax, titlebox)
-    plt.show()
-    
+    add_titlebox(ax, text)
 
-def plot_scatter(xs, ys, xlabel, ylabel, title, titlebox="", point_size=10):
-    fig, ax = plt.subplots()
+def add_scatter_plot(ax, xs, ys, xlabel, ylabel, title, text="", point_size=10):
     ax.scatter(xs, ys, s = point_size)
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
 
-    add_titlebox(ax, titlebox)
-    plt.show()
-
+    add_titlebox(ax, text)
 
 # Misc. helpers
 def get_params(param_names, params_dict):

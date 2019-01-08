@@ -2,6 +2,13 @@ import numpy as np
 
 class Game:
 
+    def __str__(self):
+        return "S_{:d} Game".format(self.strat_len)
+
+    def reset_b1(self, b1):
+        self.b1 = b1
+        self.set_payoffs()
+
     def get_stationary_dist(self, s1, s2, eps=1e-15):
         Q = self.generate_transition_matrix(s1, s2)
 

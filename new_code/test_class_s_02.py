@@ -1,9 +1,9 @@
 import numpy as np
 
-from class_s_02 import *
+from class_one_games import *
 from stochastic_dynamics import *
 
-from helpers_debugging import *
+from helpers import *
 
 
 game = S_2_Game(c=1.0, b1=10.0)

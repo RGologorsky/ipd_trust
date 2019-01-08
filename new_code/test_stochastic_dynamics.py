@@ -1,9 +1,9 @@
 import numpy as np
 
-from class_s_02 import *
+from class_one_games import *
 from stochastic_dynamics import *
 
-from helpers_debugging import *
+from helpers import *
 
 
 # test  get_prob_imitation(beta, pi_learner, pi_rolemodel)
@@ -49,6 +49,32 @@ assert(get_prob_mutant_fixation(N=3, beta=10, pi_xx=0, pi_xy=0, pi_yx=0, pi_yy=0
 assert(get_prob_mutant_fixation(N=13, beta=10, pi_xx=0, pi_xy=0, pi_yx=0, pi_yy=0) == 1/13.0)
 assert(get_prob_mutant_fixation(N=5, beta=10, pi_xx=0, pi_xy=0, pi_yx=0, pi_yy=1) > 1/5.0)
 
+# check both function definitions give same answer
+N = 5
+beta = 2
+pi_xx = 0.72165
+pi_xy = 0.54212
+pi_yx = 0.51620
+pi_yy = 0.67152
+
+old_def = old_get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)
+new_def = get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)
+print("Old def: {:f}, New def: {:f}. Diff: {:f}".format(old_def, new_def, new_def-old_def))
+
+assert(np.isclose(old_def,new_def))
+
+N = 50
+beta = 1.88
+pi_xx = 0.31276
+pi_xy = 0.15217
+pi_yx = 0.41290
+pi_yy = 0.20347
+
+old_def = old_get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)
+new_def = get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)
+print("Old def: {:f}, New def: {:f}. Diff: {:f}".format(old_def, new_def, new_def-old_def))
+
+assert(np.isclose(old_def,new_def))
 
 print("Passed my tests!")
 
@@ -56,7 +82,7 @@ print("Passed my tests!")
 game = S_2_Game(c=1.0, b1=10.0)
 
 N = 100
-beta = 10
+beta = 2
 eps = 0.0050
 
 host = (eps, eps)

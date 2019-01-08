@@ -22,7 +22,7 @@ def get_invader_decr_incr_ratio(j, N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
 
     return get_prob_invader_decr(j, N, beta, pi_invader, pi_host)/get_prob_invader_incr(j, N, beta, pi_invader, pi_host)
 
-def get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
+def old_get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
     summation = 1
     curr_product = 1
 
@@ -39,3 +39,24 @@ def get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
 
     #print("N = {}, beta = {}, pi_xx = {:.2f}, pi_xy = {:.2f}, pi_yx = {:.2f}, pi_yy = {:.2f}, prob: {:.2f}".format(N, beta, pi_xx, pi_xy, pi_yx, pi_yy, 1.0/summation))
     return 1.0/summation
+
+def get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
+
+    # edge case: population size = 1 -> 1 mutant = whole population
+    if N == 1:
+        return 1
+
+    a, b, c, d = pi_yy, pi_yx, pi_xy, pi_xx
+    u = float(a-b-c+d)/(N-1)
+    v = float(-a + b*N-d*N+d)/(N-1)
+
+    summation = 1
+    for k in range(1, N):
+        try:
+            summation += np.exp(-1.0*beta*k*((k+1)/2*u + v))
+        except FloatingPointError:
+            return 0
+    
+    return 1.0/summation
+
+#def new_get_prob_mutant_fixation 

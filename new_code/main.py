@@ -1,81 +1,64 @@
-from class_s_02 import S_2_Game
-from class_s_04 import S_4_Game
-from class_s_12 import S_12_Game
-from class_s_16 import S_16_Game
-
-
-from helpers import plot
-from simulation import get_invasion_distr
-
 import numpy as np
 import matplotlib.pyplot as plt
-
 import time
-# choose game
-game = S_2_Game(c=1.0, b1=10)
-ALLD = (0.005, 0.005)
-num_repeats = 2000
+
+from class_one_games import S_2_Game, S_4_Game
+from class_two_games import S_12_Game, S_16_Game
+from helpers import *
+from simulations import *
+
 
 # Parameters
+num_trials = 1000
+game = S_12_Game(c=1.0, b1=2.0, b2=1.2)
 params_dict = {
-	"game": game,
+	"game":game,
 	"N": 100,
 	"eps": 0.005,
-	"beta": 10,
-	"host": ALLD,
-	"strategy_type": "stochastic",
+	"beta": 2.0,
+	"host": tuple(0.005 for _ in range(game.strat_len)),
+	"strategy_type": "pure", # or "stochastic"
 	"max_attempts": 10**4,
 }
 
+######### Plot Successful Invaders ##########
+# start_time = time.time()
+# strategies, num_invasion_attempts = get_invasion_distr(num_trials, params_dict)
+# elapsed_time = time.time() - start_time
+
+# print("Elapsed Time: {:.2f} min".format(elapsed_time/60.0))
+
+# mean, sample_sd, string_description = get_sample_statistics(num_invasion_attempts)
+# print("Num. Invasion Attempts:\n" + string_description)
+
+# # Plot
+# ps, qs = zip(*strategies)
+# titlebox_str = "Num. Invasion Attempts:\n" + string_description
+# plot_scatter(ps, qs, "p", "q", "Successful ALL-D Invader Strategies", titlebox_str)
+#############
+
+
+num_timesteps = 10**5
+data_collection_freq = 100
+data_collection_points = np.arange(num_timesteps, step = data_collection_freq)
+
 start_time = time.time()
-strategies, num_invasion_attempts = get_invasion_distr(num_repeats, params_dict)
+host_seq, host_timespans, cc_timestep_data, g1_timestep_data = \
+	get_evolution_data(num_timesteps, data_collection_freq, params_dict)
+
 elapsed_time = time.time() - start_time
 
 print("Elapsed Time: {:.2f} min".format(elapsed_time/60.0))
-
-mean, sample_sd = np.mean(num_invasion_attempts), np.std(num_invasion_attempts, ddof=1)
-print("Num. Invasion Attempts Distribution: mean = {:.2f}, sample sd = {:2f}".format(mean, sample_sd))
-
-# print("Strategies: ", strategies)
-print("Num Invasion Attempts: ", num_invasion_attempts)
+#print("host timespans\n", host_timespans)
+#print_matrix("host_seq", host_seq)
+print("=== CC Rates ===")
+print(cc_timestep_data)
+print("=== G1 Rates ===")
+print(g1_timestep_data)
 
 # Plot
-long_invasion = list(
-					strategy 
-					for index, strategy in enumerate(strategies) \
-					if num_invasion_attempts[index] >= mean + 1.0 * sample_sd
-				)
+titlebox_str = "Params:\n $\epsilon = {:.4f}$\n $\beta = {:.4f}$"\
+				.format(params_dict["eps"], params_dict["beta"])
 
-short_invasion = list(
-					strategy 
-					for index, strategy in enumerate(strategies) \
-					if num_invasion_attempts[index] <= mean - 1.0 * sample_sd
-				)
-
-normal_invasion = list(
-					strategy 
-					for index, strategy in enumerate(strategies) \
-					if ((num_invasion_attempts[index] > mean - 1.0 * sample_sd) and 
-						(num_invasion_attempts[index] < mean + 1.0 * sample_sd))
-
-				)
-
-fig, ax = plt.subplots()
-
-for lst, color in [(long_invasion, "red"), (short_invasion, "magenta"), (normal_invasion, "black")]:
-	if len(lst) > 0:
-		ps, qs     = zip(*lst)
-		ax.scatter(ps, qs, s = 10, color=color)
-
-# label each point w/num. invasions
-do_label = False
-if do_label:
-	for i, strategy in enumerate(strategies):
-		num_attempts = num_invasion_attempts[i]
-		ax.annotate(str(num_attempts), strategy)
-
-
-ax.set_title('Successful ALL-D Invader Strategies')
-ax.set_xlabel('p')
-ax.set_ylabel('q')
-plt.show()
+plot_line(data_collection_points, cc_timestep_data, \
+			"Timestep", "CC rate", "Evolution of Mutual Cooperation", titlebox_str)

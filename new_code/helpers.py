@@ -69,5 +69,41 @@ def add_scatter_plot(ax, xs, ys, xlabel, ylabel, title, text="", point_size=10):
 def get_params(param_names, params_dict):
     return (params_dict[name] for name in param_names)
 
+# returns -1 if elt not in lst
+def get_index(elt, lst):
+    try:
+        return lst.index(elt)
+    except ValueError:
+        return -1
+
+
+def bin_array(num, m):
+    """Convert a positive integer num into an m-bit bit vector"""
+    return np.array(list(np.binary_repr(num).zfill(m))).astype(np.int8)
+
+str_to_state_dict = {
+    "1CC": 0,
+    "1CD": 1,
+    "1DC": 2,
+    "1DD": 3,
+    "2CC": 4,
+    "2CD": 5,
+    "2DC": 6,
+    "2DD": 7,
+    # "CC": 0,
+    # "CD": 1,
+    # "DC": 2,
+    # "DD": 3
+}
+
+states_to_str_dict = {val: key for key,val in str_to_state_dict.items()}
+
+# lst of "1CC", "1DC" to corresponding state identifiers
+def str_list_to_states(lst):
+    return [str_to_state_dict[string] for string in lst]
+
+def states_to_str_lst(lst):
+    return [states_to_str_dict[state] for state in lst]
+
 # def get_sampled_timesteps(num_timesteps, data_collection_freq):
 #     return np.arange(num_timesteps, step=)

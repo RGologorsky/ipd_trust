@@ -6,7 +6,7 @@ from find_spe import *
 
 # Parameters
 c=1.00
-b1=1.30
+b1=1.61
 b2=1.20
 
 delta = 0.999

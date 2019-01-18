@@ -2,21 +2,23 @@ import numpy as np
 import time
 
 from class_two_games import S_12_Game, S_16_Game
-from find_spe import *
+from find_spe_functions import *
 
 # Parameters
 c=1.00
 b1=1.61
 b2=1.20
 
-delta = 0.999
+# 1.0 - 10**(-2) = 0.99 -> exponent = num decimal places
+delta = 1.0 - 10**(-5)
 S12_game = S_12_Game(c, b1, b2)
 S16_game = S_16_Game(c, b1, b2)
 
 def run():
 
 	# print parameters
-	print("Parameters: delta = {:.3f}, c={:.2f}, b1 = {:.2f}, b2 = {:.2f}".format(delta, c, b1, b2))
+	params_str = "_delta_{:.10f}_c_{:.2f}_b1_{:.2f}_b2_{:.2f}".format(delta, c, b1, b2)
+	print("Parameters: delta = {:.10f}, c={:.2f}, b1 = {:.2f}, b2 = {:.2f}".format(delta, c, b1, b2))
 
 	# S12, all SPE
 	start_time = time.time()
@@ -52,7 +54,6 @@ def run():
 
 	# save data to file
 	prefix, suffix = "spe/", ".csv"
-	params_str = "_delta_{:.3f}_c_{:.2f}_b1_{:.2f}_b2_{:.2f}".format(delta, c, b1, b2)
 	names = ["S12_all_SPE", "S12_full_coop_SPE", "S16_all_SPE", "S16_full_coop_SPE"]
 	data = [s_12_spe_lst, s_12_full_coop_spe_lst, s_16_spe_lst, s_16_full_coop_spe_lst]
 	for i, lst in enumerate(data):

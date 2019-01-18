@@ -3,7 +3,7 @@ import numpy as np
 class Game:
 
     def __str__(self):
-        return "S_{:d} Game".format(self.strat_len)
+        return "S_{:d}_Game".format(self.strat_len)
 
     def reset_b1(self, b1):
         self.b1 = b1
@@ -54,7 +54,7 @@ class Game:
         #s1_single_c_rate = v[0] + v[1] + v[4] + v[5]
         #s2_single_c_rate = v[0] + v[2] + v[4] + v[6]
         
-        cc_rate = v[0] + v[4] if self.num_states == 8 else v[0]
+        cc_rate = v[0] #+ v[4] if self.num_states == 8 else v[0]
         g1_rate = sum(v[0:4]) # 1CC, 1CD, 1DC, 1DD
 
         return (s1_payoff, s2_payoff, cc_rate, g1_rate)

@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 from stochastic_dynamics import *
-from helpers import *
+from helper_functions import *
 
 # returns CC and G1 average over evolutionary timeframe
 def get_evolution_avgs(num_timesteps, params_dict):

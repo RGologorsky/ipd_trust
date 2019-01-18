@@ -3,7 +3,7 @@ import numpy as np
 from class_one_games import *
 from stochastic_dynamics import *
 
-from helpers import *
+from helper_functions import *
 
 
 game = S_4_Game(c=1.0, b1=10.0)

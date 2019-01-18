@@ -4,7 +4,7 @@ import time
 
 from class_one_games import S_2_Game, S_4_Game
 from class_two_games import S_12_Game, S_16_Game
-from helpers import *
+from helper_functions import *
 from simulations import *
 
 

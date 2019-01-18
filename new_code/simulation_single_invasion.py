@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 from stochastic_dynamics import *
-from helpers import *
+from helper_functions import *
 
 
 # returns first succesful mutant strategy and the number of invasion attempts before host succumbed

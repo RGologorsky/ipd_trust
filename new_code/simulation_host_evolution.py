@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 from stochastic_dynamics import *
-from helpers import *
+from helper_functions import *
 
 
 # returns the sequence of host strategies, each strategy's timespan as host, CC and G1 timestep data

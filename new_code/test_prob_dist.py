@@ -14,9 +14,9 @@ import matplotlib.pyplot as plt
 import time
 
 # choose game
-game = S_4_Game(c=1.0, b1=10)
+game = S_2_Game(c=1.0, b1=10)
 ALLD = (0.005 for _ in range(game.strat_len))
-num_trials = 10**4
+num_trials = 10**2
 
 # Parameters
 params_dict = {

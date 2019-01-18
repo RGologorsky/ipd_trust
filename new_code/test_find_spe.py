@@ -1,7 +1,8 @@
 import numpy as np
-from find_spe import *
-from helpers import *
-from class_two_games import *
+
+from find_spe_functions import *
+from helper_functions   import *
+from class_two_games    import *
 
 
 # === testing get_avg_round_payoff ===
@@ -159,6 +160,52 @@ s_12_game = S_12_Game(c=1.0, b1=1.3, b2=1.2)
 strat = [1,0,0,0,0,0,0,1,1,0,0,1]
 is_strat_spe = (is_spe(strat, s_12_game, delta))
 assert(is_strat_spe)
+
+# testing odd spe
+print("\ntesting strat [1,1,1,1, 1,0,1,1 ,1,1,0,1]\n")
+
+c = 1.0
+b1 = 1.8
+b2 = 1.2
+delta = 0.99
+
+s_12_game = S_12_Game(c, b1, b2)
+
+strat = [1,1,1,1, 1,0,1,1 ,1,1,0,1]
+is_strat_spe = (is_spe(strat, s_12_game, delta))
+is_strat_full_coop_spe = (is_strat_spe and is_full_coop_strat(strat, s_12_game))
+
+Q_dict      = get_Q_dictionary(strat, s_12_game) 
+payoff_dict = get_p2_payoff_dictionary(strat, s_12_game)
+
+start_state = 0 #1CC
+
+auto_res = get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict)
+manual_res = b1 - c
+
+print("Auto = {:7f}, Manual = {:.7f}, Diff = {:.7f}".format(auto_res, manual_res, manual_res-auto_res))
+assert(np.isclose(manual_res, auto_res))
+
+start_state = 1 #1CD
+
+next_state = Q_dict[start_state]
+next_next_state = Q_dict[next_state]
+next_next_next_state = Q_dict[next_next_state]
+
+strs = states_to_str_lst([start_state, next_state, next_next_state, next_next_next_state])
+
+print("{:s} -> {:s} -> {:s} -> {:s}".format(strs[0], strs[1], strs[2], strs[3]))
+
+auto_res = get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict)
+manual_total = b1 + delta*(delta * b2 - c) * (1.0/(1.0-delta**2))
+expected_num_rounds = 1.0/(1.0-delta)
+manual_res = manual_total / expected_num_rounds
+
+print("Auto = {:7f}, Manual = {:.7f}, Diff = {:.7f}".format(auto_res, manual_res, manual_res-auto_res))
+assert(np.isclose(manual_res, auto_res))
+
+assert(is_strat_spe)
+assert(not is_strat_full_coop_spe)
 
 print("\nPassed is_spe_s12(strat, game, delta={:5f}).\n".format(delta))
 print("Passed my tests!")

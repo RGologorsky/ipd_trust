@@ -40,6 +40,105 @@ class TwoGame(Game):
         self.p1_payoffs = np.asarray([b1-c, -c, b1, 0, b2-c, -c, b2, 0]);
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0, b2-c, b2, -c, 0]);
 
+class S_8_Game(TwoGame):
+
+    strat_len = 8
+
+    def generate_transition_matrix(self, s1, s2):
+        (pcc, pcd, pdc, pdd,  xcc, xcd, xdc, xdd) = s1
+        (qcc, qcd, qdc, qdd,  ycc, ycd, ydc, ydd) = s2
+
+        return np.asarray([
+            [
+                self.f(xcc, ycc)*pcc*qcc, \
+                self.f(xcc, ycc)*pcc*(1 - qcc), \
+                self.f(xcc, ycc)*(1 - pcc)*qcc, \
+                self.f(xcc, ycc)*(1 - pcc)*(1 - qcc), \
+                (1 - self.f(xcc, ycc))*pcc* qcc, \
+                (1 - self.f(xcc, ycc))*pcc* (1 - qcc), \
+                (1 - self.f(xcc, ycc))* (1 - pcc)*qcc, \
+                (1 - self.f(xcc, ycc))* (1 - pcc)* (1 - qcc) \
+            ],
+
+            [
+                self.f(xcd, ydc)*pcd*qdc, \
+                self.f(xcd, ydc)*pcd*(1 - qdc), \
+                self.f(xcd, ydc)*(1 - pcd)*qdc, \
+                self.f(xcd, ydc)*(1 - pcd)*(1 - qdc), \
+                (1 - self.f(xcd, ydc))*pcd*qdc, \
+                (1 - self.f(xcd, ydc))*pcd*(1 - qdc), \
+                (1 - self.f(xcd, ydc))*(1 - pcd)*qdc, \
+                (1 - self.f(xcd, ydc))*(1 - pcd)*(1 - qdc), \
+            ],
+
+            [
+                self.f(xdc, ycd)*pdc*qcd, \
+                self.f(xdc, ycd)*pdc*(1 - qcd), \
+                self.f(xdc, ycd)* (1 - pdc)*qcd, \
+                self.f(xdc, ycd)*(1 - pdc)*(1 - qcd), \
+                (1 - self.f(xdc, ycd))*pdc*qcd, \
+                (1 - self.f(xdc, ycd))*pdc*(1 - qcd), \
+                (1 - self.f(xdc, ycd))*(1 - pdc)* qcd, \
+                (1 - self.f(xdc, ycd))*(1 - pdc)*(1 - qcd), \
+            ],
+
+            [
+                self.f(xdd, ydd)*pdd*qdd, \
+                self.f(xdd, ydd)*pdd*(1 - qdd), \
+                self.f(xdd, ydd)*(1 - pdd)*qdd, \
+                self.f(xdd, ydd)*(1 - pdd)*(1 - qdd), \
+                (1 - self.f(xdd, ydd))*pdd*qdd, \
+                (1 - self.f(xdd, ydd))*pdd*(1 - qdd), \
+                (1 - self.f(xdd, ydd))*(1 - pdd)*qdd, \
+                (1 - self.f(xdd, ydd))*(1 - pdd)*(1 - qdd), \
+            ],
+
+            [
+                self.f(xcc, ycc)*pcc*qcc, \
+                self.f(xcc, ycc)*pcc*(1 - qcc), \
+                self.f(xcc, ycc)*(1 - pcc)*qcc, \
+                self.f(xcc, ycc)*(1 - pcc)*(1 - qcc), \
+                (1 - self.f(xcc, ycc))*pcc* qcc, \
+                (1 - self.f(xcc, ycc))*pcc* (1 - qcc), \
+                (1 - self.f(xcc, ycc))* (1 - pcc)*qcc, \
+                (1 - self.f(xcc, ycc))* (1 - pcc)* (1 - qcc), \
+            ],
+
+            [
+                self.f(xcd, ydc)*pcd*qdc, \
+                self.f(xcd, ydc)*pcd*(1 - qdc), \
+                self.f(xcd, ydc)*(1 - pcd)*qdc, \
+                self.f(xcd, ydc)*(1 - pcd)*(1 - qdc), \
+                (1 - self.f(xcd, ydc))*pcd*qdc, \
+                (1 - self.f(xcd, ydc))*pcd*(1 - qdc), \
+                (1 - self.f(xcd, ydc))*(1 - pcd)*qdc, \
+                (1 - self.f(xcd, ydc))*(1 - pcd)*(1 - qdc), \
+            ],
+
+            [
+                self.f(xdc, ycd)*pdc*qcd, \
+                self.f(xdc, ycd)*pdc*(1 - qcd), \
+                self.f(xdc, ycd)* (1 - pdc)*qcd, \
+                self.f(xdc, ycd)*(1 - pdc)*(1 - qcd), \
+                (1 - self.f(xdc, ycd))*pdc*qcd, \
+                (1 - self.f(xdc, ycd))*pdc*(1 - qcd), \
+                (1 - self.f(xdc, ycd))*(1 - pdc)* qcd, \
+                (1 - self.f(xdc, ycd))*(1 - pdc)*(1 - qcd), \
+            ],
+
+            [
+                self.f(xdd, ydd)*pdd*qdd, \
+                self.f(xdd, ydd)*pdd*(1 - qdd), \
+                self.f(xdd, ydd)*(1 - pdd)*qdd, \
+                self.f(xdd, ydd)*(1 - pdd)*(1 - qdd), \
+                (1 - self.f(xdd, ydd))*pdd*qdd, \
+                (1 - self.f(xdd, ydd))*pdd*(1 - qdd), \
+                (1 - self.f(xdd, ydd))*(1 - pdd)*qdd, \
+                (1 - self.f(xdd, ydd))*(1 - pdd)*(1 - qdd), \
+            ]
+        ]);
+
+
 class S_12_Game(TwoGame):
 
     strat_len = 12

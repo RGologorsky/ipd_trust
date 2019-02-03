@@ -3,7 +3,7 @@ import numpy as np
 class Game:
 
     def __str__(self):
-        return "S_{:d}_Game".format(self.strat_len)
+        return "S_{:02d}".format(self.strat_len)
 
     def reset_b1(self, b1):
         self.b1 = b1

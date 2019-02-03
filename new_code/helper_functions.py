@@ -17,7 +17,7 @@ def get_sample_statistics(sample):
     mean      = np.mean(sample)
     sample_sd = np.std(sample, ddof=1)
 
-    string_description =  "sample mean = {:.4f}\nsample sd = {:.4f}".format(mean, sample_sd)
+    string_description =  "sample mean = {:.4f}\nsample sd   = {:.4f}".format(mean, sample_sd)
 
     return mean, sample_sd, string_description
 

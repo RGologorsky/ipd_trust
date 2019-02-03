@@ -1,4 +1,6 @@
 import time
+from pathlib import Path
+
 
 #from class_one_games import S_2_Game, S_4_Game
 from class_two_games import S_8_Game, S_12_Game, S_16_Game
@@ -22,7 +24,7 @@ eps, beta = get_params(["eps", "beta"], params_dict)
 folder_timestamp = time.strftime("date_%Y_%m_%d")
 folder = "data/num_timesteps/eps_{:.2e}_beta_{:.2e}/{:s}/".format(eps, beta, folder_timestamp)
 
-print("Folder: {:s}\n".format(folder))
+print("\nFolder: {:s}\n".format(folder))
 
 b1_list = [1.8]
 
@@ -55,6 +57,16 @@ def write_b1_effect_data():
 
 		for game in games:
 
+			# file where to save data
+			filepath = get_filepath(str(game), eps, beta, num_timesteps)
+
+			# check if already data already calculated
+			my_file = Path(filepath)
+			
+			if my_file.is_file():
+				print("Already done")
+				continue
+
 			# set game, host strategy
 			host_strat = (params_dict["eps"],) *  game.strat_len
 
@@ -80,7 +92,7 @@ def write_b1_effect_data():
 
 			# save data
 			with open(filepath,'ab') as f:
-			    np.savetxt(f, sampled_cc_avgs, delimiter=",")
+				    np.savetxt(f, sampled_cc_avgs, delimiter=",")
 
 	print("Done.")
 

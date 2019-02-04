@@ -8,5 +8,5 @@
 #SBATCH -e myerrors_%j.err  # File to which STDERR will be written, %j inserts jobid
 
 module load Anaconda3/5.0.1-fasrc02 #Load Perl module
-source activate thesis_env
+source activate thesis_env2
 python3 'short.py'

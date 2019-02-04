@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "short.py", line 40, in <module>
-    pathlib.Path(folder).mkdir(parents=True, exist_ok=True) 
-TypeError: mkdir() got an unexpected keyword argument 'exist_ok'

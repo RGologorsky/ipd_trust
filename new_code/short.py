@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import time
 
 from class_one_games import S_2_Game, S_4_Game

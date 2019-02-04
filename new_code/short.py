@@ -9,8 +9,8 @@ import pandas as pd
 import pathlib # to create directory if needed
 
 # Parameters
-num_runs = 3
-num_timesteps = 1*(10**3)
+num_runs = 5
+num_timesteps = 3*(10**5)
 
 params_dict = {
 	"N": 100,
@@ -31,7 +31,7 @@ c2 = c
 folder_timestamp = time.strftime("date_%Y_%m_%d")
 eps, beta = get_params(["eps", "beta"], params_dict)
 
-folder = "data/b1_effect/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
+folder = "data/b1_effect/virtual/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
 		.format(eps, beta, num_timesteps, c, b2, folder_timestamp)
 
 print("\nFolder: {:s}\n".format(folder))
@@ -42,11 +42,10 @@ pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
 b1_list = np.arange(1.0, 3.2, 0.14)
 
 
-
 games   = [
 			# S_2_Game(c=1.0, b1=1.2), 
 			#S_4_Game(c=1.0, b1=2.0), 
-			#S_8_Game(c=1.0, b1=2.0, b2=1.2), 
+			S_8_Game(c=1.0, b1=2.0, b2=1.2), 
 			S_12_Game(c=1.0, b1=2.0, b2=1.2), 
 			S_16_Game(c=1.0, b1=2.0, b2=1.2)
 		]
@@ -98,7 +97,7 @@ def write_b1_effect_data():
 		all_game_data.append(game_data)
 
 	all_game_data = pd.concat(all_game_data)
-	all_game_data.to_csv(folder + 'all_short_two_game_df.csv', index=False)
+	all_game_data.to_csv(folder + 'all_two_game_df.csv', index=False)
 
 
 write_b1_effect_data()

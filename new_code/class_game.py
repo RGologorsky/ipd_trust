@@ -54,10 +54,12 @@ class Game:
         #s1_single_c_rate = v[0] + v[1] + v[4] + v[5]
         #s2_single_c_rate = v[0] + v[2] + v[4] + v[6]
         
-        cc_rate = v[0] #+ v[4] if self.num_states == 8 else v[0]
-        g1_rate = sum(v[0:4]) # 1CC, 1CD, 1DC, 1DD
+        g1_cc_rate = v[0] #+ v[4] if self.num_states == 8 else v[0]
+        g2_cc_rate = v[4] if self.num_states > 4 else 0
 
-        return (s1_payoff, s2_payoff, cc_rate, g1_rate)
+        g1_game_rate = sum(v[0:4]) # 1CC, 1CD, 1DC, 1DD
+
+        return (s1_payoff, s2_payoff, g1_cc_rate, g2_cc_rate, g1_game_rate)
 
     # each specifc game class must implement these two methods
     def generate_transition_matrix(self, s1, s2):

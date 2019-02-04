@@ -12,8 +12,9 @@ def get_evolution_avgs(num_timesteps, params_dict):
     N, eps, beta, host, Game, strategy_type, max_attempts = get_params(params_needed, params_dict)
 
     # avg over entire evolution simulation
-    cc_avg = 0
-    g1_avg = 0
+    g1_cc_avg = 0
+    g2_cc_avg = 0
+    g1_game_avg = 0
 
     # set up random variables to simulate evolution
     random_floats  = np.random.random(size=num_timesteps)
@@ -26,7 +27,7 @@ def get_evolution_avgs(num_timesteps, params_dict):
     
     # store current host v. host payoff
     curr_host = host
-    pi_xx, _, cc_rate, g1_rate  = Game.get_stats(curr_host, curr_host)
+    pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate  = Game.get_stats(curr_host, curr_host)
 
     # Main Evolution Loop
     for timestep in range(num_timesteps):
@@ -48,14 +49,15 @@ def get_evolution_avgs(num_timesteps, params_dict):
         # update host strategy
         if random_float <= prob_invasion:
             curr_host = mutant
-            pi_xx, _, cc_rate, g1_rate  = Game.get_stats(curr_host, curr_host)
+            pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate  = Game.get_stats(curr_host, curr_host)
 
         
         # store data
-        cc_avg += cc_rate
-        g1_avg += g1_rate
+        g1_cc_avg += g1_cc_rate
+        g2_cc_avg += g2_cc_rate
+        g1_game_avg += g1_game_rate
 
-    return cc_avg/float(num_timesteps), g1_avg/float(num_timesteps)
+    return g1_cc_avg/float(num_timesteps), g2_cc_avg/float(num_timesteps), g1_game_avg/float(num_timesteps)
 
 
 # returns CC avgs and G1 avgs for each tested param value

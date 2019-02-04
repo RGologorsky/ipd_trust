@@ -156,10 +156,10 @@ is_wsls_spe = (is_spe(WSLS, s_12_game, delta))
 print("3. exact (b1 slightly below cutoff). is WSLS SPE? ", is_wsls_spe)
 assert(not is_wsls_spe)
 
-s_12_game = S_12_Game(c=1.0, b1=1.3, b2=1.2)
-strat = [1,0,0,0,0,0,0,1,1,0,0,1]
-is_strat_spe = (is_spe(strat, s_12_game, delta))
-assert(is_strat_spe)
+# s_12_game = S_12_Game(c=1.0, b1=1.3, b2=1.2)
+# strat = [1,0,0,0,0,0,0,1,1,0,0,1]
+# is_strat_spe = (is_spe(strat, s_12_game, delta))
+# assert(is_strat_spe)
 
 # testing odd spe
 print("\ntesting strat [1,1,1,1, 1,0,1,1 ,1,1,0,1]\n")
@@ -196,16 +196,20 @@ strs = states_to_str_lst([start_state, next_state, next_next_state, next_next_ne
 
 print("{:s} -> {:s} -> {:s} -> {:s}".format(strs[0], strs[1], strs[2], strs[3]))
 
+dev_states = possible_dev_states(str_to_state_dict["1CD"], strat=strat)
+print("1CD dev states\n", states_to_str_lst(dev_states))
+
 auto_res = get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict)
 manual_total = b1 + delta*(delta * b2 - c) * (1.0/(1.0-delta**2))
 expected_num_rounds = 1.0/(1.0-delta)
 manual_res = manual_total / expected_num_rounds
 
-print("Auto = {:7f}, Manual = {:.7f}, Diff = {:.7f}".format(auto_res, manual_res, manual_res-auto_res))
+print("Auto = {:7f}, Manual = {:.7f}, Diff = {:.7f}\n".format(auto_res, manual_res, manual_res-auto_res))
 assert(np.isclose(manual_res, auto_res))
 
-assert(is_strat_spe)
+assert(not is_strat_spe)
 assert(not is_strat_full_coop_spe)
+
 
 print("\nPassed is_spe_s12(strat, game, delta={:5f}).\n".format(delta))
 print("Passed my tests!")

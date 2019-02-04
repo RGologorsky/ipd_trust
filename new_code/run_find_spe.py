@@ -6,7 +6,7 @@ from find_spe_functions import *
 
 # Parameters
 c=1.00
-b1=1.61
+b1=1.59
 b2=1.20
 
 # 1.0 - 10**(-2) = 0.99 -> exponent = num decimal places

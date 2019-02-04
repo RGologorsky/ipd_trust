@@ -1,17 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import time
 
 from class_one_games import S_2_Game, S_4_Game
-from class_two_games import S_12_Game, S_16_Game
+from class_two_games import S_8_Game, S_12_Game, S_16_Game
 from simulation_evolution_avgs import *
 
-# add timestamp unique id to avoid overwriting old data
-file_timestamp = time.strftime("date_%Y_%m_%d")
+import pandas as pd
+import pathlib # to create directory if needed
 
 # Parameters
-num_runs = 4
-num_timesteps = 2*(10**5)
+num_runs = 2
+num_timesteps = 1*(10**3)
 
 params_dict = {
 	"N": 100,
@@ -22,31 +23,50 @@ params_dict = {
 }
 
 
+c = 1.0
+b2 = 1.2
+
+c1 = c
+c2 = c
+
+# set folder name
+folder_timestamp = time.strftime("date_%Y_%m_%d")
+eps, beta = get_params(["eps", "beta"], params_dict)
+
+folder = "data/b1_effect/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
+		.format(eps, beta, num_timesteps, c, b2, folder_timestamp)
+
+print("\nFolder: {:s}\n".format(folder))
+
+# create directory
+pathlib.Path(folder).mkdir(parents=True, exist_ok=True) 
+
 b1_list = np.arange(1.0, 3.2, 0.14)
-# games   = [
-# 			S_4_Game(c=1.0, b1=2.0), 
-# 			S_12_Game(c=1.0, b1=2.0, b2=1.2), S_16_Game(c=1.0, b1=2.0, b2=1.2)
-# 		]
+
+
+
 games   = [
-			S_2_Game(c=1.0, b1=1.2), S_4_Game(c=1.0, b1=2.0), 
-			S_12_Game(c=1.0, b1=2.0, b2=1.2), S_16_Game(c=1.0, b1=2.0, b2=1.2)
+			# S_2_Game(c=1.0, b1=1.2), 
+			#S_4_Game(c=1.0, b1=2.0), 
+			S_8_Game(c=1.0, b1=2.0, b2=1.2), 
+			S_12_Game(c=1.0, b1=2.0, b2=1.2), 
+			S_16_Game(c=1.0, b1=2.0, b2=1.2)
 		]
 
-
-def get_filename(game_str, run, eps, beta, num_timesteps):
-	#timestamp = time.strftime("date_%Y_%m_%d_time_%H_%M_%S")
-	params_str = "game_{:s}_run_{:d}_eps_{:.2e}_beta_{:.2e}_T_{:.2e}_{:s}"\
-							.format(game_str, run, eps, beta, num_timesteps, file_timestamp)
-
-	filename = "data/b1_effect_{:s}.csv".format(params_str)
-	return filename			
 
 
 def write_b1_effect_data():
 
+	# get parameters
 	eps, beta = get_params(["eps", "beta"], params_dict)
 
+	# store all data in dataframe
+	all_game_data = []
+
 	for game in games:
+
+		# dataframe for this game/strategy space
+		game_data = []
 
 		# set game, host strategy
 		host_strat = (params_dict["eps"],) *  game.strat_len
@@ -61,78 +81,51 @@ def write_b1_effect_data():
 			
 			# get data
 			start_time = time.time()
-			cc_avgs, g1_avgs = get_b1_evolution_data(num_timesteps, b1_list, params_dict)
+			g1_cc_avgs, g2_cc_avgs, g1_game_avgs = get_b1_evolution_data(num_timesteps, b1_list, params_dict)
 			elapsed_time = time.time() - start_time
 
 			print("Elapsed Time: {:.2f} min".format(elapsed_time/60.0))
 
-			# file where to save data
-			filename = get_filename(str(game), run, eps, beta, num_timesteps)
+			# convert later into Pandas Dataframe
+			df = pd.DataFrame(np.column_stack([b1_list, g1_cc_avgs, g2_cc_avgs, g1_game_avgs]), 
+                               columns=['b1', '1CC rate', '2CC rate', 'Game 1 rate'])
 
-			# save data
-			with open(filename,'ab') as f:
-			    np.savetxt(f, (b1_list, cc_avgs, g1_avgs), delimiter=",")
+			df['strat'] = str(game)
 
+			game_data.append(df)
 
-def get_avg_b1_effect_data():
-	data = [None] * len(games)
+		game_data = pd.concat(game_data)
+		game_data.to_csv(folder + '{:s}_df.csv'.format(str(game)), index=False)
 
-	eps, beta = get_params(["eps", "beta"], params_dict)
+		all_game_data.append(game_data)
 
-	for index, game in enumerate(games):
-
-		b1_list, cc_avgs, g1_avgs = None, None, None
-
-		# take avg over all the runs
-		for run in range(num_runs):
-
-			# file where to save data
-			filename = get_filename(str(game), run, eps, beta, num_timesteps)
-			#print("filename", filename) #print("\n")
-
-			# read data
-			b1_list, round_cc_avgs, round_g1_avgs = np.loadtxt(filename, delimiter=',')
-
-			if cc_avgs is None:
-				cc_avgs = round_cc_avgs/(float(num_runs))
-				g1_avgs = round_g1_avgs/(float(num_runs))
-			else:
-				cc_avgs += round_cc_avgs/(float(num_runs))
-				g1_avgs += round_g1_avgs/(float(num_runs))
+	all_game_data = pd.concat(all_game_data)
+	all_game_data.to_csv(folder + 'all_df.csv', index=False)
 
 
-		# store this game's data
-		data[index] = (b1_list, cc_avgs, g1_avgs)
+def plot_b1_effect_data():
 
+	sns.set(style="darkgrid", palette="pastel")
 
-	return data
+	# Load the example tips dataset
+	data = pd.read_csv(folder + "all_df.csv")
 
+	g = sns.lineplot(x="b1", y="1CC rate", hue="strat",
+             data=data)
+
+	g.set_title('Effect of b1 on Cooperation')
+	g.set_xlabel("b1 value (b2 = 1.2, c1 = c2 = 1.0)")
+
+	plt.tight_layout()
+	plt.savefig("imgs/b1_effect/1cc.eps", format='eps', dpi=1000)
+
+	plt.show()
 
 def plot_all_b1_effect_data():
 
-	# recover data
-	(s_2_data, s_4_data, s_12_data, s_16_data) = get_avg_b1_effect_data()
-
-	s_2_b1_list,  s_2_cc_avgs,  s_2_g1_avgs = s_2_data
-	s_4_b1_list,  s_4_cc_avgs,  s_4_g1_avgs = s_4_data
-	s_12_b1_list, s_12_cc_avgs, s_12_g1_avgs = s_12_data
-	s_16_b1_list, s_16_cc_avgs, s_16_g1_avgs = s_16_data
-
-	# plot CC data
-	fig_cc, ((ax1, ax2), (ax3, ax4)) = plt.subplots(nrows=2, ncols=2, 
-													# sharex='col', sharey='row',
-													 figsize=(12, 12))
-
-	# CC fig
-	super_title = "Evolving Cooperation Rates"
-	fig_cc.suptitle(super_title, fontsize=14, fontweight='bold')
-
-	# axes labels
-	xlabel = "b1/c ratio"
-	ylabel = "Cooperation Rate"
-
-	# axis titles
-	axis_titles = ["{:s} Evolving Cooperation Rate".format(str(game)) for game in games]
+	# seaborn data
+	sns.set(style="darkgrid", palette="pastel")
+	data = pd.read_csv(folder + "all_df.csv")
 
 	# parameters
 	eps, beta = get_params(["eps", "beta"], params_dict)
@@ -141,54 +134,51 @@ def plot_all_b1_effect_data():
 	beta = r"$\beta$"    + " = {:2.2e}\n ".format(beta)
 	ts = r"$T$"             + " = {:2.2e}".format(num_timesteps)
 
-	param_str = "Parameters:\n " + eps + beta + ts + "\n\n" + "Avg over {:d} Runs".format(num_runs)
+	game_param = "b2 = {:.2f}\nc1 = c2 = {:.2f}".format(b2, c1)
+	sep = "\n\n"
+	param_str = "Evolution Parameters:\n " + eps + beta + ts + sep + \
+				"Game Parameters:\n"  + game_param + sep + \
+				"{:d} Runs".format(num_runs)
 
-	plt.subplots_adjust(bottom=0.20, top=0.92)
+	
+	# plot CC data
+	fig, ((ax1, ax2, ax3, ax4)) = plt.subplots(nrows=1, ncols=4, figsize = (24,6))
+													# sharex='col', sharey='row',
+													 
 
-	plt.figtext(0.5, 0.05, param_str, horizontalalignment='center',
+	ax4.text(0.5, 0.5, param_str, horizontalalignment='center',
             fontsize=12, multialignment='left',
             bbox=dict(boxstyle="round", facecolor='#D8D8D8',
             ec="0.5", pad=0.5, alpha=1), fontweight='bold')
 
-	# add data
-	add_line_plot(ax1, s_2_b1_list, s_2_cc_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[0], text="", point_size=10)
-	add_line_plot(ax2, s_4_b1_list, s_4_cc_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[1], text="", point_size=10)
-	add_line_plot(ax3, s_12_b1_list, s_12_cc_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[2], text="", point_size=10)
-	add_line_plot(ax4, s_16_b1_list, s_16_cc_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[3], text="", point_size=10)
+	ax4.axis('off')
 
-	timestamp = time.strftime("date_%Y_%m_%d_time_%H_%M_%S")
-	fig_cc.savefig('imgs/evolving_cc_rates_{:s}.png'.format(timestamp))
 
-	# plot G1 data
-	fig_g1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(nrows=2, ncols=2, 
-													# sharex='col', sharey='row',
-													 figsize=(12, 12))
+	super_title = "Effect of b1 on the Evolution of Cooperation"
 
-	# G1 fig
-	super_title = "Evolving Game 1 Rates"
-	fig_g1.suptitle(super_title, fontsize=14, fontweight='bold')
+	fig.suptitle(super_title, fontsize=14, fontweight='bold')
 
 	# axes labels
-	xlabel = "b1/c ratio"
-	ylabel = "Game 1 Rate"
+	ax_xlabel = "b1 value"
+	
+	ax1_ylabel = "1CC Rate"
+	ax2_ylabel = "2CC Rate"
+	ax3_ylabel = "Game 1 Rate"
 
-	# axis titles
-	axis_titles = ["{:s} Evolving Game 1 Rate".format(str(game)) for game in games]
+	# lineplots
+	cc1_g = sns.lineplot(x="b1", y="1CC rate", hue="strat", data=data, ax = ax1)
+	cc2_g = sns.lineplot(x="b1", y="2CC rate", hue="strat", data=data, ax = ax2)
+	game1_g = sns.lineplot(x="b1", y="Game 1 rate", hue="strat", data=data, ax = ax3)
+
+	# set labels
+	cc1_g.set_xlabel(ax_xlabel)
+	cc2_g.set_xlabel(ax_xlabel)
+	game1_g.set_xlabel(ax_xlabel)
 
 
-	plt.subplots_adjust(bottom=0.20, top=0.92)
+	fig.subplots_adjust(hspace=1, wspace=1)
+	#plt.tight_layout()
 
-	plt.figtext(0.5, 0.05, param_str, horizontalalignment='center',
-            fontsize=12, multialignment='left',
-            bbox=dict(boxstyle="round", facecolor='#D8D8D8',
-            ec="0.5", pad=0.5, alpha=1), fontweight='bold')
+	fig.savefig("imgs/b1_effect/all.eps", format='eps', dpi=1000)
 
-	# add data
-	add_line_plot(ax1, s_2_b1_list, s_2_g1_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[0], text="", point_size=10)
-	add_line_plot(ax2, s_4_b1_list, s_4_g1_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[1], text="", point_size=10)
-	add_line_plot(ax3, s_12_b1_list, s_12_g1_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[2], text="", point_size=10)
-	add_line_plot(ax4, s_16_b1_list, s_16_g1_avgs, xlabel=xlabel, ylabel=ylabel, title=axis_titles[3], text="", point_size=10)
-
-	fig_g1.savefig('imgs/evolving_g1_rates_{:s}.png'.format(timestamp))
-
-	print("Done.")
+	plt.show()

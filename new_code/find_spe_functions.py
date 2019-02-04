@@ -99,6 +99,9 @@ def is_spe(strat, game, delta):
 		baseline_start_state = Q_dict[prior_state]
 		all_possible_devs = possible_dev_states(prior_state, strat)
 
+		# remove baseline next state from consideration 
+		all_possible_devs.discard(baseline_start_state)
+
 		baseline_payoff = get_avg_round_payoff(baseline_start_state, delta, Q_dict, payoff_dict)
 		dev_payoffs = [get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict) 
 						for start_state in all_possible_devs
@@ -106,8 +109,11 @@ def is_spe(strat, game, delta):
 
 		max_dev_payoff = max(dev_payoffs)
 
-		# print("max dev payoff", max_dev_payoff)
-		return (max_dev_payoff <= baseline_payoff)
+		if (max_dev_payoff > baseline_payoff):
+			return False
+
+	# print("max dev payoff", max_dev_payoff)
+	return True
 
 # checks whether the strategy fully cooperates (1CC always) when it plays against itself
 # starting frmo any position

@@ -1,6 +1,6 @@
 import time
 from pathlib import Path
-
+import os
 
 #from class_one_games import S_2_Game, S_4_Game
 from class_two_games import S_8_Game, S_12_Game, S_16_Game
@@ -8,8 +8,8 @@ from simulation_evolution_avgs import *
 
 
 # Parameters
-num_runs = 10
-num_timesteps_list = [10**3]
+num_runs = 5
+num_timesteps_list = [2*10**5, 3*10**5]
 
 params_dict = {
 	"N": 100,
@@ -22,7 +22,7 @@ params_dict = {
 # set folder name
 eps, beta = get_params(["eps", "beta"], params_dict)
 folder_timestamp = time.strftime("date_%Y_%m_%d")
-folder = "data/num_timesteps/eps_{:.2e}_beta_{:.2e}/{:s}/".format(eps, beta, folder_timestamp)
+folder = "data/num_timesteps/runs_{:d}_eps_{:.2e}_beta_{:.2e}/{:s}/".format(num_runs, eps, beta, folder_timestamp)
 
 print("\nFolder: {:s}\n".format(folder))
 
@@ -63,9 +63,16 @@ def write_b1_effect_data():
 			# check if already data already calculated
 			my_file = Path(filepath)
 			
-			if my_file.is_file():
-				print("Already done")
-				continue
+			try:
+
+				if my_file.is_file():
+					print("Already done")
+					continue
+
+				else:
+					os.makedirs(os.path.dirname(filepath), exist_ok=True)
+			except:
+				os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
 			# set game, host strategy
 			host_strat = (params_dict["eps"],) *  game.strat_len
@@ -74,7 +81,7 @@ def write_b1_effect_data():
 			params_dict["host"] = host_strat
 
 			# announce what we are calculating
-			print("Game: {:s}, Num Timesteps: {:d}".format(str(game), num_timesteps))
+			print("Game: {:s}, Num Timesteps: {:.2e}".format(str(game), num_timesteps))
 
 			start_time = time.time()
 			sampled_cc_avgs = [get_evolution_avgs(num_timesteps, params_dict)[0] 
@@ -87,8 +94,8 @@ def write_b1_effect_data():
 			mean, sample_sd, string_description = get_sample_statistics(sampled_cc_avgs)
 			print(string_description, "\n")
 
-			# file where to save data
-			filepath = get_filepath(str(game), eps, beta, num_timesteps)
+			# # file where to save data
+			# filepath = get_filepath(str(game), eps, beta, num_timesteps)
 
 			# save data
 			with open(filepath,'ab') as f:

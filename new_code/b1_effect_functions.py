@@ -11,8 +11,8 @@ import pandas as pd
 import pathlib # to create directory if needed
 
 # Parameters
-num_runs = 2
-num_timesteps = 1*(10**3)
+num_runs = 5
+num_timesteps = 3*(10**5)
 
 params_dict = {
 	"N": 100,
@@ -100,7 +100,7 @@ def write_b1_effect_data():
 		all_game_data.append(game_data)
 
 	all_game_data = pd.concat(all_game_data)
-	all_game_data.to_csv(folder + 'all_df.csv', index=False)
+	all_game_data.to_csv(folder + 'all_two_game_df.csv', index=False)
 
 
 def plot_b1_effect_data():

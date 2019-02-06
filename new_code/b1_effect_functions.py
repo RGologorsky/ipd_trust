@@ -30,7 +30,7 @@ c1 = c
 c2 = c
 
 # set folder name
-folder_timestamp = time.strftime("date_%Y_%m_%d")
+folder_timestamp = time.strftime("date_%Y_%m_%d_%H:%M:%S")
 eps, beta = get_params(["eps", "beta"], params_dict)
 
 folder = "data/b1_effect/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
@@ -41,16 +41,23 @@ print("\nFolder: {:s}\n".format(folder))
 # create directory
 pathlib.Path(folder).mkdir(parents=True, exist_ok=True) 
 
+img_folder = "imgs/b1_effect/long_time/two_game/"
+img_filename = "two_game_all.png"
+
+# create directory
+pathlib.Path(img_folder).mkdir(parents=True, exist_ok=True) 
+
 b1_list = np.arange(1.0, 3.2, 0.14)
 
+strategy_space = "one_game"
 
 
 games   = [
-			# S_2_Game(c=1.0, b1=1.2), 
-			#S_4_Game(c=1.0, b1=2.0), 
-			S_8_Game(c=1.0, b1=2.0, b2=1.2), 
-			S_12_Game(c=1.0, b1=2.0, b2=1.2), 
-			S_16_Game(c=1.0, b1=2.0, b2=1.2)
+			S_2_Game(c=1.0, b1=1.2), 
+			S_4_Game(c=1.0, b1=2.0), 
+			#S_8_Game(c=1.0, b1=2.0, b2=1.2), 
+			#S_12_Game(c=1.0, b1=2.0, b2=1.2), 
+			#S_16_Game(c=1.0, b1=2.0, b2=1.2)
 		]
 
 
@@ -100,7 +107,7 @@ def write_b1_effect_data():
 		all_game_data.append(game_data)
 
 	all_game_data = pd.concat(all_game_data)
-	all_game_data.to_csv(folder + 'all_two_game_df.csv', index=False)
+	all_game_data.to_csv(folder + "all_" + strategy_space + "_df.csv", index=False)
 
 
 def plot_b1_effect_data():
@@ -123,9 +130,11 @@ def plot_b1_effect_data():
 
 def plot_all_b1_effect_data():
 
+	data_folder = "data/b1_effect/long_time_two_game/eps_1.00e-03_beta_2.00e+00_T_3.00e+05_c_1.00_b2_1.20/date_2019_02_05/"
+	data_filename = "all_two_game_df.csv"
 	# seaborn data
 	sns.set(style="darkgrid", palette="pastel")
-	data = pd.read_csv(folder + "all_df.csv")
+	data = pd.read_csv(data_folder + data_filename)
 
 	# parameters
 	eps, beta = get_params(["eps", "beta"], params_dict)
@@ -161,24 +170,26 @@ def plot_all_b1_effect_data():
 	# axes labels
 	ax_xlabel = "b1 value"
 	
-	ax1_ylabel = "1CC Rate"
-	ax2_ylabel = "2CC Rate"
-	ax3_ylabel = "Game 1 Rate"
+	ax1_ylabel = "Game 1 Rate"
+	ax2_ylabel = "1CC Rate"
+	ax3_ylabel = "2CC Rate"
 
 	# lineplots
-	cc1_g = sns.lineplot(x="b1", y="1CC rate", hue="strat", data=data, ax = ax1)
-	cc2_g = sns.lineplot(x="b1", y="2CC rate", hue="strat", data=data, ax = ax2)
-	game1_g = sns.lineplot(x="b1", y="Game 1 rate", hue="strat", data=data, ax = ax3)
+	game1_g = sns.lineplot(x="b1", y="Game 1 rate", hue="strat", data=data, ax = ax1)
+	cc1_g = sns.lineplot(x="b1", y="1CC rate", hue="strat", data=data, ax = ax2)
+	cc2_g = sns.lineplot(x="b1", y="2CC rate", hue="strat", data=data, ax = ax3)
+	
 
 	# set labels
+	game1_g.set_xlabel(ax_xlabel)
 	cc1_g.set_xlabel(ax_xlabel)
 	cc2_g.set_xlabel(ax_xlabel)
-	game1_g.set_xlabel(ax_xlabel)
+	
 
 
 	fig.subplots_adjust(hspace=1, wspace=1)
 	#plt.tight_layout()
 
-	fig.savefig("imgs/b1_effect/all.eps", format='eps', dpi=1000)
+	fig.savefig(img_folder + img_filename, dpi=300)
 
 	plt.show()

@@ -31,7 +31,7 @@ c2 = c
 folder_timestamp = time.strftime("date_%Y_%m_%d")
 eps, beta = get_params(["eps", "beta"], params_dict)
 
-folder = "data/b1_effect/virtual/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
+folder = "data/b1_effect/long_time_two_game/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
 		.format(eps, beta, num_timesteps, c, b2, folder_timestamp)
 
 print("\nFolder: {:s}\n".format(folder))

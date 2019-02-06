@@ -7,6 +7,7 @@ class TwoGame(Game):
     # 1CC, ..., 1DD, 2CC, ... 2DD
     num_states = 8
 
+    # maps a number to corresponding state
     num_to_state = {
         0: (1,0,0,0,0,0,0,0),
         1: (0,1,0,0,0,0,0,0),
@@ -18,6 +19,49 @@ class TwoGame(Game):
         7: (0,0,0,0,0,0,0,1),
     }
 
+    # maps a state to a corresponding number
+    state_to_num = {val: key for key, val in num_to_state.items()}
+
+    # Which game is next? f takes in each player's Prob[prefer Game 1] and outputs Prob[next is Game 1]
+    @staticmethod
+    def f(a,b): 
+        pass
+
+    def __init__(self, c, b1, b2):
+        self.c = c
+        self.b1 = b1
+        self.b2  = b2
+
+        self.set_payoffs()
+
+    def set_payoffs(self):
+        b1 = self.b1
+        b2 = self.b2
+        c = self.c
+
+        self.p1_payoffs = np.asarray([b1-c, -c, b1, 0, b2-c, -c, b2, 0]);
+        self.p2_payoffs = np.asarray([b1-c, b1, -c, 0, b2-c, b2, -c, 0]);
+
+
+
+class TwoGame(Game):
+
+    # 1CC, ..., 1DD, 2CC, ... 2DD
+    num_states = 8
+
+    # maps a number to corresponding state
+    num_to_state = {
+        0: (1,0,0,0,0,0,0,0),
+        1: (0,1,0,0,0,0,0,0),
+        2: (0,0,1,0,0,0,0,0),
+        3: (0,0,0,1,0,0,0,0),
+        4: (0,0,0,0,1,0,0,0),
+        5: (0,0,0,0,0,1,0,0),
+        6: (0,0,0,0,0,0,1,0),
+        7: (0,0,0,0,0,0,0,1),
+    }
+
+    # maps a state to a corresponding number
     state_to_num = {val: key for key, val in num_to_state.items()}
 
     # environment state transition probability given each player's state preference

@@ -70,6 +70,7 @@ def get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict):
 # player1 = 2C: can deviate to 2CC, 2CD (coop = 1 -> states 4,5)
 # player1 = 2D: can deviate to 2DC, 2DD (coop = 0 -> states 6,7)
 
+
 def possible_dev_states(prior_state, strat):
 
 	# S8 vs. S12 vs. S16 

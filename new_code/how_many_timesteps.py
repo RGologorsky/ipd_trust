@@ -16,7 +16,6 @@ params_dict = {
 	"eps": 0.001,
 	"beta": 2.0,
 	"strategy_type": "pure", # or "stochastic"
-	"max_attempts": 10**4,
 }
 
 # set folder name

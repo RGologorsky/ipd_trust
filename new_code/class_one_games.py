@@ -12,13 +12,14 @@ class OneGame(Game):
         self.b1 = b1
         self.set_payoffs()
 
+        self.game_transition_dynamics = "NA"
+
     def set_payoffs(self):
         b1 = self.b1
         c = self.c
 
         self.p1_payoffs = np.asarray([b1-c, -c, b1, 0]);
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0]);
-
 
 class S_2_Game(OneGame):
 

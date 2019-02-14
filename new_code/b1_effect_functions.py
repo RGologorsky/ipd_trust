@@ -10,104 +10,74 @@ from simulation_evolution_avgs import *
 import pandas as pd
 import pathlib # to create directory if needed
 
-# Parameters
-num_runs = 5
-num_timesteps = 3*(10**5)
+from parameters import *
 
-params_dict = {
-	"N": 100,
-	"eps": 0.001,
-	"beta": 2.0,
-	"strategy_type": "pure", # or "stochastic"
-	"max_attempts": 10**4,
-}
-
-
-c = 1.0
-b2 = 1.2
-
-c1 = c
-c2 = c
+#from test_parameters import *
 
 # set folder name
-folder_timestamp = time.strftime("date_%Y_%m_%d_%H:%M:%S")
-eps, beta = get_params(["eps", "beta"], params_dict)
+folder_timestamp = time.strftime("date_%Y_%m_%d_%H_%M_%S")
 
-folder = "data/b1_effect/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
-		.format(eps, beta, num_timesteps, c, b2, folder_timestamp)
+data_folder = get_folder(folder_timestamp, directory="data/b1_effect")
+img_folder  = get_folder(folder_timestamp, directory="imgs/b1_effect")
 
-print("\nFolder: {:s}\n".format(folder))
+print("\nData Folder: {:s}\n".format(data_folder))
 
-# create directory
-pathlib.Path(folder).mkdir(parents=True, exist_ok=True) 
 
-img_folder = "imgs/b1_effect/long_time/two_game/"
-img_filename = "two_game_all.png"
-
-# create directory
-pathlib.Path(img_folder).mkdir(parents=True, exist_ok=True) 
+#b1_list = np.arange(1.0, 3.2, 0.56)
 
 b1_list = np.arange(1.0, 3.2, 0.14)
 
-strategy_space = "one_game"
-
 
 games   = [
-			S_2_Game(c=1.0, b1=1.2), 
-			S_4_Game(c=1.0, b1=2.0), 
-			#S_8_Game(c=1.0, b1=2.0, b2=1.2), 
-			#S_12_Game(c=1.0, b1=2.0, b2=1.2), 
-			#S_16_Game(c=1.0, b1=2.0, b2=1.2)
+			#S_2_Game(c=1.0, b1=1.2), 
+			#S_4_Game(c=1.0, b1=2.0), 
+			S_8_Game(c=1.0, b1=2.0, b2=1.2,  game_transition_dynamics=transitions[0]), 
+			S_12_Game(c=1.0, b1=2.0, b2=1.2, game_transition_dynamics=transitions[0]), 
+			S_16_Game(c=1.0, b1=2.0, b2=1.2, game_transition_dynamics=transitions[0]), 
 		]
-
 
 
 def write_b1_effect_data():
 
-	# get parameters
-	eps, beta = get_params(["eps", "beta"], params_dict)
-
-	# store all data in dataframe
-	all_game_data = []
-
 	for game in games:
 
-		# dataframe for this game/strategy space
-		game_data = []
+		for game_transition_dynamics in transitions:
+			game.set_game_transition_dynamics(game_transition_dynamics)
 
-		# set game, host strategy
-		host_strat = (params_dict["eps"],) *  game.strat_len
+			# set game, host strategy
+			host_strat = (params_dict["eps"],) *  game.strat_len
 
-		params_dict["game"] = game
-		params_dict["host"] = host_strat
+			params_dict["game"] = game
+			params_dict["host"] = host_strat
 
-		for run in range(num_runs):
+			# store b1-effect runs over strat + transition space
+			strat_transition_dynamics = []
+			data_filename = data_folder + str(game) + ".csv"
 
-			# announce what we are calculating
-			print("Game: {:s}, Run: {:d}".format(str(game), run))
-			
-			# get data
-			start_time = time.time()
-			g1_cc_avgs, g2_cc_avgs, g1_game_avgs = get_b1_evolution_data(num_timesteps, b1_list, params_dict)
-			elapsed_time = time.time() - start_time
+			for run in range(num_runs):
 
-			print("Elapsed Time: {:.2f} min".format(elapsed_time/60.0))
+				# announce what we are calculating
+				print("Game: {:s}, Run: {:d}".format(str(game), run))
+				
+				# get data
+				start_time = time.time()
+				g1_cc_avgs, g2_cc_avgs, g1_game_avgs = get_b1_evolution_data(num_timesteps, b1_list, params_dict)
+				elapsed_time = time.time() - start_time
 
-			# convert later into Pandas Dataframe
-			df = pd.DataFrame(np.column_stack([b1_list, g1_cc_avgs, g2_cc_avgs, g1_game_avgs]), 
-                               columns=['b1', '1CC rate', '2CC rate', 'Game 1 rate'])
+				print("Elapsed Time: {:.2f} min".format(elapsed_time/60.0))
 
-			df['strat'] = str(game)
+				df = pd.DataFrame(np.column_stack([b1_list, g1_cc_avgs, g2_cc_avgs, g1_game_avgs]), 
+	                               columns=['b1', '1CC rate', '2CC rate', 'Game 1 rate'])
 
-			game_data.append(df)
+				df['strat']       = str(game)
+				df['strat_space'] = game.strat_str()
+				df['transition']  = game.transition_str()
 
-		game_data = pd.concat(game_data)
-		game_data.to_csv(folder + '{:s}_df.csv'.format(str(game)), index=False)
+				strat_transition_dynamics.append(df)
 
-		all_game_data.append(game_data)
-
-	all_game_data = pd.concat(all_game_data)
-	all_game_data.to_csv(folder + "all_" + strategy_space + "_df.csv", index=False)
+			# turn list into df that holds all the runs for a particular strat + transition dynamics	
+			strat_transition_dynamics = pd.concat(strat_transition_dynamics)
+			strat_transition_dynamics.to_csv(data_filename, index=False)
 
 
 def plot_b1_effect_data():

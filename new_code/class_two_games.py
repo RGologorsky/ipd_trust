@@ -1,4 +1,5 @@
 import numpy as np
+from random import random
 
 from class_game import Game
 
@@ -23,16 +24,14 @@ class TwoGame(Game):
     state_to_num = {val: key for key, val in num_to_state.items()}
 
     # Which game is next? f takes in each player's Prob[prefer Game 1] and outputs Prob[next is Game 1]
-    @staticmethod
-    def f(a,b): 
-        pass
-
-    def __init__(self, c, b1, b2):
+    def __init__(self, c, b1, b2, game_transition_dynamics):
         self.c = c
         self.b1 = b1
         self.b2  = b2
 
         self.set_payoffs()
+        self.set_game_transition_dynamics(game_transition_dynamics)
+
 
     def set_payoffs(self):
         b1 = self.b1
@@ -43,52 +42,57 @@ class TwoGame(Game):
         self.p2_payoffs = np.asarray([b1-c, b1, -c, 0, b2-c, b2, -c, 0]);
 
 
+    def set_game_transition_dynamics(self, game_transition_dynamics):
 
-class TwoGame(Game):
+        self.game_transition_dynamics = game_transition_dynamics
 
-    # 1CC, ..., 1DD, 2CC, ... 2DD
-    num_states = 8
+        if game_transition_dynamics == "EqualSay_G2_Default":
+            # Prob[G1] = Prob[player 1 AND player 2 want G1]
+            def f(a,b): return a*b
 
-    # maps a number to corresponding state
-    num_to_state = {
-        0: (1,0,0,0,0,0,0,0),
-        1: (0,1,0,0,0,0,0,0),
-        2: (0,0,1,0,0,0,0,0),
-        3: (0,0,0,1,0,0,0,0),
-        4: (0,0,0,0,1,0,0,0),
-        5: (0,0,0,0,0,1,0,0),
-        6: (0,0,0,0,0,0,1,0),
-        7: (0,0,0,0,0,0,0,1),
-    }
+        elif game_transition_dynamics == "EqualSay_G1_Default":
+            # Prob[G1] = 1 - Prob[player 1 AND player 2 want G2]
+            # = Prob[player 1 OR player 2 want G1] = a + b - a*b
+            def f(a,b): return a + b - a*b # return 1 - (1-a)*(1-b)
 
-    # maps a state to a corresponding number
-    state_to_num = {val: key for key, val in num_to_state.items()}
+        elif game_transition_dynamics == "Unilateral_Dictator":
+            # Prob[G1] =  Prob[player 1 wants G1] = a, or
+            # Prob[G1] = Prob[plaeyr 2 wants G2] = b.
+            def f_player1_dictator (a,b): return a 
+            def f_player2_dictator (a,b): return b
 
-    # environment state transition probability given each player's state preference
-    @staticmethod
-    def f(a,b): 
-        return a*b
+            self.f_player1_dictator = f_player1_dictator
+            self.f_player2_dictator = f_player2_dictator
 
-    def __init__(self, c, b1, b2):
-        self.c = c
-        self.b1 = b1
-        self.b2  = b2
+            def f(a,b): pass
 
-        self.set_payoffs()
+        elif game_transition_dynamics == "Player2_Dictator":
+            # Prob[G1] =  Prob[player 1 wants G1]
+            def f(a,b): return b
 
-    def set_payoffs(self):
-        b1 = self.b1
-        b2 = self.b2
-        c = self.c
+        elif game_transition_dynamics == "Random_Dictator":
+            # Prob[G1] =  Prob[player 1 dictator and he wants G1] + Prob[player 2 dictator and he wants G1]
+            def f(a,b):
+                return 0.5*a + 0.5*b
 
-        self.p1_payoffs = np.asarray([b1-c, -c, b1, 0, b2-c, -c, b2, 0]);
-        self.p2_payoffs = np.asarray([b1-c, b1, -c, 0, b2-c, b2, -c, 0]);
+        elif game_transition_dynamics == "Random":
+            # Prob[G1] =  0.50
+            def f(a,b):
+                return 0.5
+
+        else:
+            raise ValueError("Unknown Game1 <-> Game2 transition dynamics.")
+
+        self.f = f
+
+
 
 class S_8_Game(TwoGame):
 
     strat_len = 8
 
     def generate_transition_matrix(self, s1, s2):
+
         (pcc, pcd, pdc, pdd,  xcc, xcd, xdc, xdd) = s1
         (qcc, qcd, qdc, qdd,  ycc, ycd, ydc, ydd) = s2
 

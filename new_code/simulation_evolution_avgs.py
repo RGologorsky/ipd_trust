@@ -5,11 +5,15 @@ from stochastic_dynamics import *
 from helper_functions import *
 
 # returns CC and G1 average over evolutionary timeframe
-def get_evolution_avgs(num_timesteps, params_dict):
+# @profile
+def get_evolution_avgs(num_timesteps, params_dict, b1):
 
     # get needed parameters
-    params_needed = ("N", "eps", "beta", "host", "game", "strategy_type", "max_attempts")
-    N, eps, beta, host, Game, strategy_type, max_attempts = get_params(params_needed, params_dict)
+    params_needed = ("N", "eps", "beta", "host", "game", "strategy_type")
+    N, eps, beta, host, Game, strategy_type = get_params(params_needed, params_dict)
+
+    # reset b1
+    Game.reset_b1(b1)
 
     # avg over entire evolution simulation
     g1_cc_avg = 0
@@ -40,17 +44,16 @@ def get_evolution_avgs(num_timesteps, params_dict):
         pi_xy, pi_yx  = Game.get_payoffs(curr_host, mutant)
         pi_yy, _      = Game.get_payoffs(mutant,    mutant)   
 
-        prob_invasion = get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy)
-
         # get random float, update float index
         random_float = random_floats[random_float_index]
         random_float_index += 1
 
-        # update host strategy
-        if random_float <= prob_invasion:
+        # update host strategy if random_float <= Prob[invasion]
+        if does_mutant_fixate(N, beta, pi_xx, pi_xy, pi_yx, pi_yy, random_float):
+
+            # update host strategy
             curr_host = mutant
             pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate  = Game.get_stats(curr_host, curr_host)
-
         
         # store data
         g1_cc_avg += g1_cc_rate
@@ -61,12 +64,16 @@ def get_evolution_avgs(num_timesteps, params_dict):
 
 
 # returns CC avgs and G1 avgs for each tested param value
+#@profile
 def get_b1_evolution_data(num_timesteps, b1_list, params_dict):
-    game = params_dict["game"]
+    return zip (*[get_evolution_avgs(num_timesteps, params_dict, b1) for b1 in b1_list])
+    # return zip(*data)
+    # game = params_dict["game"]
 
-    def get_b1_datapoint(b1):
-        game.reset_b1(b1)
-        return get_evolution_avgs(num_timesteps, params_dict)
+    # def get_b1_datapoint(b1):
+    #     game.reset_b1(b1)
+    #     return get_evolution_avgs(num_timesteps, params_dict)
 
-    data = [get_b1_datapoint(b1) for b1 in b1_list]
-    return zip(*data)
+    # data = [get_b1_datapoint(b1) for b1 in b1_list]
+    # data = [get_evolution_avgs(num_timesteps, params_dict, b1) for b1 in b1_list]
+    # return zip(*data)

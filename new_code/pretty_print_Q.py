@@ -1,5 +1,9 @@
 import numpy as np
 
+import matplotlib.pyplot as plt
+import pandas as pd
+from pandas.plotting import table
+
 Q  = np.asarray([
             [
                 "f(x1cc, y1cc)*p1cc*q1cc", \
@@ -89,3 +93,36 @@ Q  = np.asarray([
                 "(1 - f(x2dd, y2dd))*(1 - p2dd)*(1 - q2dd)", \
             ]
         ])
+
+Q_df = pd.DataFrame({
+    '1CC':Q[:,0],
+    '1CD':Q[:,1],
+    '1DC':Q[:,2],
+    '1DD':Q[:,3],
+
+    '2CC':Q[:,4],
+    '2CD':Q[:,5],
+    '2DC':Q[:,6],
+    '2DD':Q[:,7],
+})
+
+states = ["1CC", "1CD", "1DC", "1DD", "2CC", "2CD", "2DC", "2DD"]
+Q_df.index = states
+print(Q_df)
+
+# ax = plt.subplot(111, frame_on=False) # no visible frame
+# ax.xaxis.set_visible(False)  # hide the x axis
+# ax.yaxis.set_visible(False)  # hide the y axis
+
+# table(ax, Q_df)  # where df is your data frame
+
+fig, ax = plt.subplots(figsize=(24, 24)) # set size frame
+ax.xaxis.set_visible(False)  # hide the x axis
+ax.yaxis.set_visible(False)  # hide the y axis
+ax.set_frame_on(False)  # no visible frame, uncomment if size is ok
+tabla = table(ax, Q_df, loc='upper right', colWidths=[.60]*len(Q_df.columns))  # where df is your data frame
+tabla.auto_set_font_size(False) # Activate set fontsize manually
+tabla.set_fontsize(10) # if ++fontsize is necessary ++colWidths
+tabla.scale(1.2, 1.2) # change size table
+
+plt.savefig('Q.png')

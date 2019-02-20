@@ -28,17 +28,23 @@ transitions = [
     "Random",
 ]
 
-eps, beta = get_params(["eps", "beta"], params_dict)
+N, eps, beta = get_params(["N", "eps", "beta"], params_dict)
 
-# loc = "data" or "imgs"
-# experiment = "b1_effect" or "spe"
+save_params_dict = {
 
-def get_folder(timestamp, directory="data/b1_effect"):
-	# set folder name
-	folder = "{:s}/eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
-		.format(directory, eps, beta, num_timesteps, c, b2, timestamp)
+	# test params
+	"num_runs": num_runs,
+	"num_timesteps": num_timesteps,
 
-	# create directory
-	pathlib.Path(folder).mkdir(parents=True, exist_ok=True) 
-
-	return folder
+	# evolutionary params
+	"N": 100,
+	"eps": 0.001,
+	"beta": 2.0,
+	"strategy_type": "pure", # or "stochastic"
+	
+	# game params
+	"c": c,
+	"b2": b2,
+	"c1": c,
+	"c2": c,
+}

@@ -64,16 +64,5 @@ def get_evolution_avgs(num_timesteps, params_dict, b1):
 
 
 # returns CC avgs and G1 avgs for each tested param value
-#@profile
 def get_b1_evolution_data(num_timesteps, b1_list, params_dict):
     return zip (*[get_evolution_avgs(num_timesteps, params_dict, b1) for b1 in b1_list])
-    # return zip(*data)
-    # game = params_dict["game"]
-
-    # def get_b1_datapoint(b1):
-    #     game.reset_b1(b1)
-    #     return get_evolution_avgs(num_timesteps, params_dict)
-
-    # data = [get_b1_datapoint(b1) for b1 in b1_list]
-    # data = [get_evolution_avgs(num_timesteps, params_dict, b1) for b1 in b1_list]
-    # return zip(*data)

@@ -5,8 +5,14 @@ import pandas as pd
 import os.path
 from pathlib import Path
 
-folder_type = "all"
-specific = ""
+types =["all", "within_strategy", "within_transition"]
+
+specifics_a = ["s_08", "s_12", "s_16"]
+specifics_b = ["full_set_g1_default", "full_set_g2_default", "full_set_random", "full_set_random_dictator", "full_set_unilateral_dictator"]
+
+
+folder_type = types[2]
+specific = specifics_b[4]
 
 parent_folder = "data/full_set_{:s}/".format(folder_type)
 sub_folder = "{:s}/".format(specific)

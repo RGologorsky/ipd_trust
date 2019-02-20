@@ -1,6 +1,31 @@
 import numpy as np
 np.seterr(over='raise')
 
+# Given a random float Unif ~ (0,1), this function returns True with Prob[mutant fixates]
+# Prob[rand <= p] = p. 1/3 <= p equiv. 3 >= 1/p; rand_inverse >= summation, summation <= rand_inverse.
+def does_mutant_fixate(N, beta, pi_xx, pi_xy, pi_yx, pi_yy, random_float):
+
+    # edge case: population size = 1 -> 1 mutant = whole population, definitely fixates
+    if N == 1:
+        return True
+
+    a, b, c, d = pi_yy, pi_yx, pi_xy, pi_xx
+    u = (a-b-c+d)/(N-1.0)
+    v = (-a + b*N-d*N+d)/(N-1.0)
+
+    summation = 1
+
+    rand_inverse = 1.0/random_float
+
+    for k in range(1, N):
+        summation += np.exp(-1.0*beta*k*((k+1)/2*u + v))
+
+        # if prob small, no point in calculating it all out
+        if summation > rand_inverse:
+            return False
+        
+    return True
+    
 # Probability Helpers
 def get_prob_imitation(beta, pi_learner, pi_rolemodel):
     return 1.0/(1.0 + np.exp(-1.0 * beta * (pi_rolemodel - pi_learner)))
@@ -65,30 +90,5 @@ def get_prob_mutant_fixation(N, beta, pi_xx, pi_xy, pi_yx, pi_yy):
     except FloatingPointError:
         return 0.0
     
-
-# Given a random float Unif ~ (0,1), this function returns True with Prob[mutant fixates]
-# Prob[rand <= p] = p. 1/3 <= p equiv. 3 >= 1/p; rand_inverse >= summation, summation <= rand_inverse.
-def does_mutant_fixate(N, beta, pi_xx, pi_xy, pi_yx, pi_yy, random_float):
-
-    # edge case: population size = 1 -> 1 mutant = whole population, definitely fixates
-    if N == 1:
-        return True
-
-    a, b, c, d = pi_yy, pi_yx, pi_xy, pi_xx
-    u = (a-b-c+d)/(N-1.0)
-    v = (-a + b*N-d*N+d)/(N-1.0)
-
-    summation = 1
-
-    rand_inverse = 1.0/random_float
-
-    for k in range(1, N):
-        summation += np.exp(-1.0*beta*k*((k+1)/2*u + v))
-
-        # if prob small, no point in calculating it all out
-        if summation > rand_inverse:
-            return False
-        
-    return True
     
 #def new_get_prob_mutant_fixation 

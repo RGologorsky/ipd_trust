@@ -107,3 +107,12 @@ def states_to_str_lst(lst):
 
 # def get_sampled_timesteps(num_timesteps, data_collection_freq):
 #     return np.arange(num_timesteps, step=)
+
+
+def save_dict(dictionary, filename):
+    with open(filename + ".json", 'w') as f:
+        json.dump(dictionary, f)
+
+def read_dict(filename):
+    with open(filename + ".json") as f:
+        return json.load(f)

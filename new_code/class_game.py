@@ -84,7 +84,15 @@ class Game:
 
         g1_game_rate = sum(v[0:4]) # 1CC, 1CD, 1DC, 1DD
 
-        return (s1_payoff, s2_payoff, g1_cc_rate, g2_cc_rate, g1_game_rate)
+        # player avg coop rate - v1CC+(v1CD+v1DC)/2+v2CC+(v2CD+v2DC)/2
+
+        two_player_c_rate = 2*v[0] + v[1] + v[2]
+        if self.num_states > 4:
+            two_player_c_rate += 2*v[4] + v[5] + v[6]
+
+        player_c_rate = two_player_c_rate/2.0
+
+        return (s1_payoff, s2_payoff, g1_cc_rate, g2_cc_rate, g1_game_rate, player_c_rate)
 
     # each specifc game class must implement these two methods
     def generate_transition_matrix(self, s1, s2):

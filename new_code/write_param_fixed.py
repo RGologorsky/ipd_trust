@@ -17,7 +17,12 @@ from helper_functions import save_dict, read_dict
 lst1 = [10**-4, 10**-3, 10**-2, 10**-1, 10**0, 10**1, 10**2]
 lst2 = [2, 4, 8, 16, 32, 64, 128]
 
-param_to_change, param_list = ("N", lst2)
+lst3 = [10**-1, 10**0, 10**1]
+lst4 = [10**-4, 10**-3, 10**-2]
+
+lst5 = [10**-4]
+
+param_to_change, param_list = ("beta", lst5)
 
 fixed_b1 = 1.8
 game = S_12_Game(c=c, b1=fixed_b1, b2=b2, game_transition_dynamics="EqualSay_G2_Default")
@@ -59,7 +64,7 @@ def write_param_fixed_data():
 	
 	# create dataframe
 	df = pd.DataFrame(index=np.arange(0, num_df_rows), \
-					  columns=('b1', '1CC rate', '2CC rate', 'Game 1 rate', param_to_change))
+					  columns=('b1', '1CC rate', '2CC rate', 'Game 1 rate', 'player_c_avg', param_to_change))
 
 	data_filename = "{:s}{:s}.csv".format(data_folder, param_to_change) #get_filename(param_value)
 
@@ -81,12 +86,12 @@ def write_param_fixed_data():
 			
 			# get data
 			start_time = time.time()
-			g1_cc_avg, g2_cc_avg, g1_game_avg = get_evolution_avgs(num_timesteps, params_dict, fixed_b1)
+			g1_cc_avg, g2_cc_avg, g1_game_avg, player_c_avg = get_evolution_avgs(num_timesteps, params_dict, fixed_b1)
 			elapsed_time = time.time() - start_time
 
 			print("Elapsed Time: {:.2f} min".format(elapsed_time/60.0))
 
-			df.loc[row_index] = (fixed_b1, g1_cc_avg, g2_cc_avg,  g1_game_avg, param_value)
+			df.loc[row_index] = (fixed_b1, g1_cc_avg, g2_cc_avg,  g1_game_avg, player_c_avg, param_value)
 			row_index += 1
 
 

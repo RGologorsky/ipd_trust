@@ -21,11 +21,11 @@ c2 = c
 
 transitions = [
 
-	#"EqualSay_G2_Default",
+	"EqualSay_G2_Default",
     #"EqualSay_G1_Default",
     #"Unilateral_Dictator",
     #"Random_Dictator",
-    "Random",
+    #"Random",
 ]
 
 N, eps, beta = get_params(["N", "eps", "beta"], params_dict)

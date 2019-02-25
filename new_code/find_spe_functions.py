@@ -1,6 +1,10 @@
 import numpy as np
 from helper_functions import get_index, bin_array
 
+### IMPORTANT ###
+### CHECK G1 OR G2 DEFAULT DEV STATES, LINE 162 ####
+#################
+
 # only for two-games. Returns dictionary d; For strat vs. strat, d[state_id] = next_state
 def get_Q_dictionary(strat, game):
 	Q = game.generate_transition_matrix(strat, strat)
@@ -70,8 +74,42 @@ def get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict):
 # player1 = 2C: can deviate to 2CC, 2CD (coop = 1 -> states 4,5)
 # player1 = 2D: can deviate to 2DC, 2DD (coop = 0 -> states 6,7)
 
+def g1_default_possible_dev_states(prior_state, strat):
 
-def possible_dev_states(prior_state, strat):
+	# S8 vs. S12 vs. S16 
+	if len(strat) == 8:
+		player1_transition = strat[4 + prior_state % 4]
+		player1_g1_action  = strat[prior_state % 4]
+		player1_g2_action  = strat[prior_state % 4]
+
+	elif len(strat) == 12:
+		player1_transition = strat[8 + prior_state % 4]
+		player1_g1_action  = strat[prior_state % 4]
+		player1_g2_action  = strat[4 + prior_state % 4]
+
+	else:
+		player1_transition = strat[8 + prior_state]
+		player1_g1_action  = strat[prior_state % 4]
+		player1_g2_action  = strat[4 + prior_state % 4]
+
+
+	# always possible to vote and force Game 1.
+	single_dev_states = {0,1} if player1_g1_action == 1 else {2,3}
+
+	# add Game 2 state deviations if Game 2 is possible
+	if player1_transition == 1:
+		return single_dev_states
+
+	# it is possible to reach Game 2
+	if player1_g2_action == 1:
+		single_dev_states.update({4,5})
+
+	else:
+		single_dev_states.update({6,7})
+
+	return single_dev_states
+
+def g2_default_possible_dev_states(prior_state, strat):
 
 	# S8 vs. S12 vs. S16 
 	if len(strat) == 8:
@@ -106,6 +144,10 @@ def possible_dev_states(prior_state, strat):
 
 	return single_dev_states
 
+### IMPORTANT ###
+### CHECK G1 OR G2 DEFAULT DEV STATES ####
+#################
+
 # checks whether (strategy, strategy) is an SPE
 def is_spe(strat, game, delta):
 	Q_dict      = get_Q_dictionary(strat, game) 
@@ -117,7 +159,7 @@ def is_spe(strat, game, delta):
 		baseline_start_state = Q_dict[prior_state]
 		baseline_payoff = get_avg_round_payoff(baseline_start_state, delta, Q_dict, payoff_dict)
 
-		all_possible_devs = possible_dev_states(prior_state, strat)
+		all_possible_devs = g1_default_possible_dev_states(prior_state, strat)
 
 		# remove baseline next state from consideration 
 		all_possible_devs.discard(baseline_start_state)

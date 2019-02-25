@@ -11,7 +11,7 @@ import pandas as pd
 import pathlib # to create directory if needed
 
 img_folder = "imgs/num_timesteps/"
-img_filename = "1cc_convergence.png"
+img_filename = "1cc_convergence.pdf"
 	
 # create img directory
 pathlib.Path(img_folder).mkdir(parents=True, exist_ok=True) 
@@ -54,8 +54,8 @@ str_labels = ["{:.2f}".format(means[i]) + r"$\pm$" + "{:.2f}".format(stds[i]) fo
 
 ind = 0
 nudge = 1.0/6.0
-up_nudge = 0.005
-side_nudge = 2.0/3.0 * nudge
+up_nudge = 0
+side_nudge = 5.0/10 * nudge
 
 for tick in range(len(g.get_xticklabels())):
 	#g.text(tick+  -3*nudge + side_nudge, m1[ind+0]+ up_nudge, mL1[ind+0], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
@@ -64,11 +64,22 @@ for tick in range(len(g.get_xticklabels())):
 	#g.text(tick+   1*nudge - side_nudge, m1[ind+3]+ up_nudge, mL1[ind+3], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
 	# g.text(tick+   2*nudge - side_nudge, m1[ind+4]+ up_nudge, mL1[ind+4],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
 	# g.text(tick+   3*nudge - side_nudge, m1[ind+5]+ up_nudge, mL1[ind+5],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	g.text(tick+2*nudge - side_nudge, means[ind+4]+up_nudge, str_labels[ind+4],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	g.text(tick+3*nudge - side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
+	if tick != 0:
+		g.text(tick+2*nudge + side_nudge, means[ind+4]+up_nudge, str_labels[ind+4],  horizontalalignment='center', color='black', weight='bold', fontsize="10")
+		g.text(tick+3*nudge + side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  horizontalalignment='center', color='black', weight='bold', fontsize="10")
     
 
 	ind += 6
+
+# fix first tick
+tick = 0
+ind = 0
+g.text(tick+2.8*nudge, means[ind+4]-0.10*nudge, str_labels[ind+4],  \
+	horizontalalignment='center', color='black', weight='bold', fontsize="10")
+
+g.text(tick+3*nudge + side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  \
+	horizontalalignment='center', color='black', weight='bold', fontsize="10")
+#g.legend([r"$10^3$", r"$10^4$", r"$10^5$", r"$2*10^5$", r"$3*10^5$", r"$10^6$"]);
 
 # g = sns.stripplot(x=strat, y="1CC rate", hue=ts,
 #                     data=data, jitter=True,
@@ -87,10 +98,16 @@ for tick in range(len(g.get_xticklabels())):
 # 		horizontalalignment='center', size='x-small', color='b', weight='semibold')
 
 
-#handles, labels = ax1.get_legend_handles_labels()
+new_labels = [r"$10^3$", r"$10^4$", r"$10^5$", r"$2*10^5$", r"$3*10^5$", r"$10^6$"];
+leg =ax.get_legend()
 
+for t, l in zip(leg.texts, new_labels): t.set_text(l)
+
+handles, labels = g.get_legend_handles_labels()
+print(handles)
+print(labels)
 #sns.despine(offset=10)
-ax.set_title('How many timesteps until the Cooperation Rate converges?')
+ax.set_title('Cooperation Rate Reproducability over 5 runs')
 ax.set_xlabel("Strategy Space")
 
 # my_labels = ['1.00e+03', '1.00e+04', '1.00e+05', '2.00e+05', '3.00e+05', '1.00e+06']
@@ -115,7 +132,7 @@ ax.set_xlabel("Strategy Space")
 # print("t", g._legend.texts)
 
 plt.tight_layout()
-plt.savefig(img_folder + img_filename, dpi=300)
+plt.savefig(img_folder + img_filename)
 
 plt.show()
 

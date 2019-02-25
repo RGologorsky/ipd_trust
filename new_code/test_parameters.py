@@ -20,10 +20,10 @@ c1 = c
 c2 = c
 
 transitions = [
-	#"EqualSay_G2_Default",
+	"EqualSay_G2_Default",
     #"EqualSay_G1_Default",
     #"Player1_Dictator",
-    "Random_Dictator",
+    #"Random_Dictator",
 ]
 
 eps, beta = get_params(["eps", "beta"], params_dict)

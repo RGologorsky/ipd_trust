@@ -10,12 +10,15 @@ import pandas as pd
 import pathlib
 
 
-data_folder   = "data/param_effect_fixed/eps/date_2019_02_20_08_54_27/"
-data_filename =  "eps.csv"
+date = "date_2019_02_22_07_52_54"
+param_to_change = "beta"
+
+data_folder   = "data/param_effect_fixed/{:s}/{:s}/".format(param_to_change, date)
+data_filename =  "{:s}.csv".format(param_to_change)
 
 img_format = "pdf"
 img_folder = data_folder
-img_filename  = "eps" + ".{:s}".format(img_format)
+img_filename  = "{:s}.{:s}".format(param_to_change, img_format)
 
 # check it exists
 pathlib.Path(data_folder).mkdir(parents=True, exist_ok=True) 
@@ -29,14 +32,15 @@ data = pd.read_csv(data_folder + data_filename)
 
 fig, ax1 = plt.subplots(nrows=1, ncols=1)
 
-ax1.set(xscale="log")
+ax1.set_xscale('log', basex=10)
+#ax1.set(xscale="log", basex=2)
 
 # seaborn graph
-g = sns.lineplot(x="eps", y="CC rate", ax=ax1, data=data)
+g = sns.lineplot(x=param_to_change, y="player_c_avg", ax=ax1, data=data)
 
-g.set_title("Effect of Noise")
-g.set_xlabel("Noise Level, {:s}".format(r'$\epsilon$'))
-g.set_ylabel("CC rate")
+g.set_title("Effect of Selection")
+g.set_xlabel("Selection Pressure, {:s}".format(r'$\beta$'))
+g.set_ylabel("Individual Cooperation Rate")
 
 
 plt.savefig(img_folder + img_filename, format=img_format)

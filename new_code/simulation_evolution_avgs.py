@@ -6,7 +6,7 @@ from helper_functions import *
 
 # returns CC and G1 average over evolutionary timeframe
 # @profile
-def get_evolution_avgs(num_timesteps, params_dict, b1):
+def get_evolution_avgs(num_timesteps, params_dict, b1, spe_list):
 
     # get needed parameters
     params_needed = ("N", "eps", "beta", "host", "game", "strategy_type")
@@ -16,9 +16,12 @@ def get_evolution_avgs(num_timesteps, params_dict, b1):
     Game.reset_b1(b1)
 
     # avg over entire evolution simulation
-    g1_cc_avg = 0
-    g2_cc_avg = 0
-    g1_game_avg = 0
+    g1_cc_avg = 0.0
+    g2_cc_avg = 0.0
+    g1_game_avg = 0.0
+    player_c_avg = 0.0
+
+    spe_list_avg = 0.0
 
     # set up random variables to simulate evolution
     random_floats  = np.random.random(size=num_timesteps)
@@ -31,7 +34,7 @@ def get_evolution_avgs(num_timesteps, params_dict, b1):
     
     # store current host v. host payoff
     curr_host = host
-    pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate  = Game.get_stats(curr_host, curr_host)
+    pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate, player_c_rate  = Game.get_stats(curr_host, curr_host)
 
     # Main Evolution Loop
     for timestep in range(num_timesteps):
@@ -53,16 +56,23 @@ def get_evolution_avgs(num_timesteps, params_dict, b1):
 
             # update host strategy
             curr_host = mutant
-            pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate  = Game.get_stats(curr_host, curr_host)
+            pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate, player_c_rate  = Game.get_stats(curr_host, curr_host)
         
         # store data
         g1_cc_avg += g1_cc_rate
         g2_cc_avg += g2_cc_rate
         g1_game_avg += g1_game_rate
+        player_c_avg += player_c_rate
 
-    return g1_cc_avg/float(num_timesteps), g2_cc_avg/float(num_timesteps), g1_game_avg/float(num_timesteps)
+        #print(spe_list)
+        #print(curr_host)
+        spe_list_avg += (curr_host in spe_list) # add 1 if curr host is in set of spe strategies
+
+    return g1_cc_avg/float(num_timesteps), g2_cc_avg/float(num_timesteps), \
+           g1_game_avg/float(num_timesteps), player_c_avg/float(num_timesteps), \
+           spe_list_avg/float(num_timesteps)
 
 
 # returns CC avgs and G1 avgs for each tested param value
-def get_b1_evolution_data(num_timesteps, b1_list, params_dict):
-    return zip (*[get_evolution_avgs(num_timesteps, params_dict, b1) for b1 in b1_list])
+def get_b1_evolution_data(num_timesteps, b1_list, params_dict, spe_lst):
+    return zip (*[get_evolution_avgs(num_timesteps, params_dict, b1, spe_lst) for b1 in b1_list])

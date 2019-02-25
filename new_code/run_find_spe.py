@@ -21,6 +21,8 @@ transitions = [
     #"Random_Dictator",
 ]
 
+transition = transitions[0]
+
 # 1.0 - 10**(-2) = 0.99 -> exponent = num decimal places
 delta = 1.0 - 10**(-5)
 S8_game  = S_8_Game(c,  b1, b2, game_transition_dynamics=transitions[0])
@@ -29,16 +31,19 @@ S16_game = S_16_Game(c, b1, b2, game_transition_dynamics=transitions[0])
 
 games = [S8_game, S12_game, S16_game]
 
-folder_timestamp = time.strftime("date_%Y_%m_%d_%H:%M:%S")
+folder_timestamp = time.strftime("date_%Y_%m_%d_%H_%M_%S")
 params_str = "delta_{:.10f}_c_{:.2f}_b1_{:.2f}_b2_{:.2f}".format(delta, c, b1, b2)
 
-folder = "data/full_coop_spe/transitions/{:s}/{:s}/".format(params_str, folder_timestamp)
+folder = "data/full_coop_spe/transitions/{:s}/{:s}/{:s}/".format(transition, params_str, folder_timestamp)
 
 # create directory
 pathlib.Path(folder).mkdir(parents=True, exist_ok=True) 
 
 
 def run():
+
+	# print folder
+	print(folder)
 
 	# print parameters
 	print("Parameters: delta = {:.10f}, c={:.2f}, b1 = {:.2f}, b2 = {:.2f}".format(delta, c, b1, b2))

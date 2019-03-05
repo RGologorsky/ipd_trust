@@ -32,6 +32,8 @@ data = pd.read_csv("data/num_timesteps/runs_5_eps_1.00e-03_beta_2.00e+00/date_20
 ts = "No. Timesteps"
 strat = "Strat"
 
+data = data[data[ts] > 10**5]
+
 g = sns.boxplot(x=strat, y="1CC rate", 
 			hue=ts, data=data, ax = ax, showmeans=True)
 
@@ -52,33 +54,33 @@ str_labels = ["{:.2f}".format(means[i]) + r"$\pm$" + "{:.2f}".format(stds[i]) fo
 # width = ax.patches[0].get_width()
 # print("patch width: ", width)
 
-ind = 0
-nudge = 1.0/6.0
-up_nudge = 0
-side_nudge = 5.0/10 * nudge
+# ind = 0
+# nudge = 1.0/6.0
+# up_nudge = 0
+# side_nudge = 5.0/10 * nudge
 
-for tick in range(len(g.get_xticklabels())):
-	#g.text(tick+  -3*nudge + side_nudge, m1[ind+0]+ up_nudge, mL1[ind+0], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	#g.text(tick+  -2*nudge + side_nudge, m1[ind+1]+ up_nudge, mL1[ind+1], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	#g.text(tick+  -1*nudge + side_nudge, m1[ind+2]+ up_nudge, mL1[ind+2], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	#g.text(tick+   1*nudge - side_nudge, m1[ind+3]+ up_nudge, mL1[ind+3], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	# g.text(tick+   2*nudge - side_nudge, m1[ind+4]+ up_nudge, mL1[ind+4],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	# g.text(tick+   3*nudge - side_nudge, m1[ind+5]+ up_nudge, mL1[ind+5],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
-	if tick != 0:
-		g.text(tick+2*nudge + side_nudge, means[ind+4]+up_nudge, str_labels[ind+4],  horizontalalignment='center', color='black', weight='bold', fontsize="10")
-		g.text(tick+3*nudge + side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  horizontalalignment='center', color='black', weight='bold', fontsize="10")
+# for tick in range(len(g.get_xticklabels())):
+# 	#g.text(tick+  -3*nudge + side_nudge, m1[ind+0]+ up_nudge, mL1[ind+0], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
+# 	#g.text(tick+  -2*nudge + side_nudge, m1[ind+1]+ up_nudge, mL1[ind+1], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
+# 	#g.text(tick+  -1*nudge + side_nudge, m1[ind+2]+ up_nudge, mL1[ind+2], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
+# 	#g.text(tick+   1*nudge - side_nudge, m1[ind+3]+ up_nudge, mL1[ind+3], horizontalalignment='center', color='black', weight='semibold', fontsize="8")
+# 	# g.text(tick+   2*nudge - side_nudge, m1[ind+4]+ up_nudge, mL1[ind+4],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
+# 	# g.text(tick+   3*nudge - side_nudge, m1[ind+5]+ up_nudge, mL1[ind+5],  horizontalalignment='center', color='black', weight='semibold', fontsize="8")
+# 	if tick != 0:
+# 		g.text(tick+2*nudge + side_nudge, means[ind+4]+up_nudge, str_labels[ind+4],  horizontalalignment='center', color='black', weight='bold', fontsize="10")
+# 		g.text(tick+3*nudge + side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  horizontalalignment='center', color='black', weight='bold', fontsize="10")
     
 
-	ind += 6
+# 	ind += 6
 
-# fix first tick
-tick = 0
-ind = 0
-g.text(tick+2.8*nudge, means[ind+4]-0.10*nudge, str_labels[ind+4],  \
-	horizontalalignment='center', color='black', weight='bold', fontsize="10")
+# # fix first tick
+# tick = 0
+# ind = 0
+# g.text(tick+2.8*nudge, means[ind+4]-0.10*nudge, str_labels[ind+4],  \
+# 	horizontalalignment='center', color='black', weight='bold', fontsize="10")
 
-g.text(tick+3*nudge + side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  \
-	horizontalalignment='center', color='black', weight='bold', fontsize="10")
+# g.text(tick+3*nudge + side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  \
+# 	horizontalalignment='center', color='black', weight='bold', fontsize="10")
 #g.legend([r"$10^3$", r"$10^4$", r"$10^5$", r"$2*10^5$", r"$3*10^5$", r"$10^6$"]);
 
 # g = sns.stripplot(x=strat, y="1CC rate", hue=ts,
@@ -98,7 +100,9 @@ g.text(tick+3*nudge + side_nudge, means[ind+5]+up_nudge, str_labels[ind+5],  \
 # 		horizontalalignment='center', size='x-small', color='b', weight='semibold')
 
 
-new_labels = [r"$10^3$", r"$10^4$", r"$10^5$", r"$2*10^5$", r"$3*10^5$", r"$10^6$"];
+#new_labels = [r"$10^3$", r"$10^4$", r"$10^5$", r"$2*10^5$", r"$3*10^5$", r"$10^6$"]
+
+new_labels = [r"$2*10^5$", r"$3*10^5$", r"$10^6$"];
 leg =ax.get_legend()
 
 for t, l in zip(leg.texts, new_labels): t.set_text(l)
@@ -107,7 +111,7 @@ handles, labels = g.get_legend_handles_labels()
 print(handles)
 print(labels)
 #sns.despine(offset=10)
-ax.set_title('Cooperation Rate Reproducability over 5 runs')
+ax.set_title('Cooperation Rate Reproducability')
 ax.set_xlabel("Strategy Space")
 
 # my_labels = ['1.00e+03', '1.00e+04', '1.00e+05', '2.00e+05', '3.00e+05', '1.00e+06']

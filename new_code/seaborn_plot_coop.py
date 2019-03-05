@@ -10,24 +10,31 @@ import pandas as pd
 import pathlib
 
 
-date = "date_2019_02_24_19_50_14"
-strat_space = "S_16"
+date = "date_2019_03_04_08_03_01" #date_2019_02_24_19_50_14"
+strat_space = "S_12"
+transition = "EqualSay_G2_Default"
 
-# date = "date_2019_02_24_19_49_44"
-# strat_space = "S_12"
+data_filename =  "all.csv"
 
-# date = "date_2019_02_24_19_48_50"
-# strat_space = "S_08"
+# Parameters
+N, eps, beta = 100, 0.01, 10.0
+num_timesteps = 10*(10**5)
+c,  b2 = 1.0, 1.2
 
-data_folder   = "data/b1_effect/eps_1.00e-03_beta_2.00e+00_T_3.00e+05_c_1.00_b2_1.20/{:s}/".format(date)
+
+params = "eps_{:.2e}_beta_{:.2e}_T_{:.2e}_c_{:.2f}_b2_{:.2f}/{:s}/"\
+		.format(eps, beta, num_timesteps, c, b2, date)
+
+data_folder   = "data/b1_effect/" + params
+
+#data_filename =  "{:s}_{:s}.csv".format(strat_space, transition)
 
 print(data_folder)
 
-data_filename =  "{:s}_EqualSay_G2_Default.csv".format(strat_space)
 
 img_format = "pdf"
 img_folder = data_folder
-img_filename  = "{:s}_EqualSay_G2_Default.{:s}".format(strat_space, img_format)
+img_filename  = "{:s}_{:s}.{:s}".format(strat_space, transition, img_format)
 
 # check it exists
 pathlib.Path(data_folder).mkdir(parents=True, exist_ok=True) 
@@ -39,6 +46,8 @@ sns.set(style="darkgrid", palette="pastel")
 # Load the dataset
 data = pd.read_csv(data_folder + data_filename)
 
+data_strat_space = data.loc[data["strat_space"] == strat_space]
+
 fig, ax1 = plt.subplots(nrows=1, ncols=1)
 
 
@@ -47,11 +56,11 @@ fig, ax1 = plt.subplots(nrows=1, ncols=1)
 
 
 # lineplots
-cc = sns.lineplot(x="b1", y="1CC rate", data=data, ax = ax1, label = "1CC rate")
-c  = sns.lineplot(x="b1", y="Cooperation rate", data=data, ax = ax1, label = "C rate")
-spe_rate  = sns.lineplot(x="b1", y="SPE rate", data=data, ax = ax1, label = "SPE rate")
+cc = sns.lineplot(x="b1", y="1CC rate", data=data_strat_space, ax = ax1, label = "1CC rate")
+c  = sns.lineplot(x="b1", y="C rate", data=data_strat_space, ax = ax1, label = "C rate")
+spe_rate  = sns.lineplot(x="b1", y="SPE rate", data=data_strat_space, ax = ax1, label = "SPE rate")
 
-title = "{:s} Cooperation Trends".format(strat_space)
+title = "{:s} {:s} Cooperation Rates".format(strat_space, transition)
 ax1_xlabel = "b1 value"
 ax1_ylabel = ""
 

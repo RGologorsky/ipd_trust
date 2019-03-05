@@ -144,12 +144,22 @@ def g2_default_possible_dev_states(prior_state, strat):
 
 	return single_dev_states
 
+def one_game_possible_dev_states(prior_state, strat):
+	player1_action = strat[prior_state]
+
+	# if player 1 cooperates, can deviate to CC or CD
+	if player1_action == 1:
+		return {0,1}
+
+	# if player 1 deviates, can deviate to DC or DD
+	return {2,3}
+
 ### IMPORTANT ###
 ### CHECK G1 OR G2 DEFAULT DEV STATES ####
 #################
 
 # checks whether (strategy, strategy) is an SPE
-def is_spe(strat, game, delta):
+def is_spe(strat, game, delta, transition):
 	Q_dict      = get_Q_dictionary(strat, game) 
 	payoff_dict = get_p2_payoff_dictionary(strat, game)
 
@@ -159,7 +169,17 @@ def is_spe(strat, game, delta):
 		baseline_start_state = Q_dict[prior_state]
 		baseline_payoff = get_avg_round_payoff(baseline_start_state, delta, Q_dict, payoff_dict)
 
-		all_possible_devs = g1_default_possible_dev_states(prior_state, strat)
+		if transition == "EqualSay_G2_Default":
+			all_possible_devs = g2_default_possible_dev_states(prior_state, strat)
+
+		elif transition == "EqualSay_G1_Default":
+			all_possible_devs = g1_default_possible_dev_states(prior_state, strat)
+
+		elif transition == "NA":
+			all_possible_devs = one_game_possible_dev_states(prior_state, strat)
+
+		else:
+			raise Exception("Unrecognized Transition Strat")
 
 		# remove baseline next state from consideration 
 		all_possible_devs.discard(baseline_start_state)
@@ -194,5 +214,18 @@ def find_all_spe(game, delta):
 		strat = bin_array(i, game.strat_len)
 
 		if is_spe(strat, game, delta):
+			spe_lst.append(strat)
+	return spe_lst
+
+
+# returns a list of all pure strategies s.t. (strat, strat) is an SPE
+def find_all_coop_spe(game, delta, transition):
+	num_strats = 2**game.strat_len
+	spe_lst = []
+
+	for i in range(num_strats):
+		strat = bin_array(i, game.strat_len)
+
+		if is_full_coop_strat(strat, game) and is_spe(strat, game, delta, transition):
 			spe_lst.append(strat)
 	return spe_lst

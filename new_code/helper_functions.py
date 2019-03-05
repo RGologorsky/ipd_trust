@@ -1,6 +1,14 @@
 import numpy as np
 import json
 
+def numpy_isclose(a, b, rtol=1.e-5, atol=1.e-8):
+    """ A equivalent to numpy's isclose method for individual floating-point values
+    
+    This is considerably faster than numpy's version over 1D arrays
+    """
+    return abs(a - b) <= (atol + rtol * abs(b))
+
+
 # generate binary 0/1 pure strategies, rescale to eps/1-eps
 def generate_pure_strategy_mutants(num_mutants, strat_len, eps):
     rand_nums = np.random.randint(2, size = num_mutants * strat_len)

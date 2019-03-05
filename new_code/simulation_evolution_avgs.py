@@ -6,7 +6,11 @@ from helper_functions import *
 
 # returns CC and G1 average over evolutionary timeframe
 # @profile
-def get_evolution_avgs(num_timesteps, params_dict, b1, spe_list):
+
+def get_evolution_avgs(num_timesteps, params_dict, b1, spe_d):
+
+    spe_list = spe_d[round(b1,2)]
+    #print(spe_list)
 
     # get needed parameters
     params_needed = ("N", "eps", "beta", "host", "game", "strategy_type")
@@ -36,6 +40,9 @@ def get_evolution_avgs(num_timesteps, params_dict, b1, spe_list):
     curr_host = host
     pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate, player_c_rate  = Game.get_stats(curr_host, curr_host)
 
+    # determine proportion of time the current host is a coop spe
+    curr_host_is_spe = (curr_host in spe_list)
+
     # Main Evolution Loop
     for timestep in range(num_timesteps):
 
@@ -57,16 +64,19 @@ def get_evolution_avgs(num_timesteps, params_dict, b1, spe_list):
             # update host strategy
             curr_host = mutant
             pi_xx, _, g1_cc_rate, g2_cc_rate, g1_game_rate, player_c_rate  = Game.get_stats(curr_host, curr_host)
+
+            # add 1 if curr host is in set of spe strategies
+            curr_host_is_spe = (curr_host in spe_list) 
         
         # store data
         g1_cc_avg += g1_cc_rate
         g2_cc_avg += g2_cc_rate
         g1_game_avg += g1_game_rate
         player_c_avg += player_c_rate
+        spe_list_avg += curr_host_is_spe
 
         #print(spe_list)
         #print(curr_host)
-        spe_list_avg += (curr_host in spe_list) # add 1 if curr host is in set of spe strategies
 
     return g1_cc_avg/float(num_timesteps), g2_cc_avg/float(num_timesteps), \
            g1_game_avg/float(num_timesteps), player_c_avg/float(num_timesteps), \
@@ -74,5 +84,5 @@ def get_evolution_avgs(num_timesteps, params_dict, b1, spe_list):
 
 
 # returns CC avgs and G1 avgs for each tested param value
-def get_b1_evolution_data(num_timesteps, b1_list, params_dict, spe_lst):
-    return zip (*[get_evolution_avgs(num_timesteps, params_dict, b1, spe_lst) for b1 in b1_list])
+def get_b1_evolution_data(num_timesteps, b1_list, params_dict, spe_d):
+    return zip (*[get_evolution_avgs(num_timesteps, params_dict, b1, spe_d) for b1 in b1_list])

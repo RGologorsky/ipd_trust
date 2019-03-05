@@ -4,17 +4,20 @@ from helper_functions import get_params
 
 # Parameters
 num_runs = 5
-num_timesteps = 3*(10**5)
-
-params_dict = {
-	"N": 100,
-	"eps": 0.001,
-	"beta": 2.0,
-	"strategy_type": "pure", # or "stochastic"
-}
+num_timesteps = 10*(10**5)
 
 c = 1.0
 b2 = 1.2
+
+params_dict = {
+	"N": 100,
+	"eps": 0.01,
+	"beta": 10.0,
+	"strategy_type": "pure", # or "stochastic"
+	"c": c,
+	"b2": b2,
+}
+
 
 c1 = c
 c2 = c

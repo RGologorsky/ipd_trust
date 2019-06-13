@@ -20,25 +20,32 @@ class OneGame(Game):
     state_to_num = {val: key for key, val in num_to_state.items()}
 
 
-    def __init__(self, c, b1):
-        self.c = c
+    def __init__(self, b1, c1):
         self.b1 = b1
+        self.c1 = c1
+        self.alpha1 = b1/c1
+
         self.set_payoffs()
 
         self.game_transition_dynamics = "NA"
+        self.f = None
+
+    def set_game_transition_dynamics(self, game_transition_dynamics):
+        pass
 
     def set_payoffs(self):
         b1 = self.b1
-        c = self.c
+        c1 = self.c1
 
-        self.p1_payoffs = np.asarray([b1-c, -c, b1, 0]);
-        self.p2_payoffs = np.asarray([b1-c, b1, -c, 0]);
+        self.p1_payoffs = np.asarray([b1-c1, -c1, b1, 0]);
+        self.p2_payoffs = np.asarray([b1-c1, b1, -c1, 0]);
 
 class S_2_Game(OneGame):
 
     strat_len = 2
 
-    def generate_transition_matrix(f, s1, s2):
+    @staticmethod
+    def generate_transition_matrix(s1, s2, f=None):
 
         (pc, pd) = s1
         (qc, qd) = s2
@@ -54,7 +61,8 @@ class S_4_Game(OneGame):
 
     strat_len = 4
 
-    def generate_transition_matrix(f, s1, s2):
+    @staticmethod
+    def generate_transition_matrix(s1, s2, f=None):
         (pcc, pcd, pdc, pdd) = s1
         (qcc, qcd, qdc, qdd) = s2
 

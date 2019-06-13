@@ -16,17 +16,18 @@ class Game:
     def __str__(self):
         return "S_{:02d}_{:s}".format(self.strat_len, self.game_transition_dynamics)
 
-    def reset_b1(self, b1):
+    def reset_game_params(self, b1, c1, b2, c2):
         self.b1 = b1
+        self.c1 = c1
+        self.b2 = b2
+        self.c2 = c2
+        self.alpha1 = b1/c1
         self.set_payoffs()
 
 
-    def get_stationary_dist(self, f, s1, s2, tolerance=1e-15):
+    def get_stationary_dist(self, s1, s2, f=None, tolerance=1e-15):
         
-        # if (s1,s2) in self.v_dict:
-        #     return self.v_dict[(s1, s2)]
-        
-        Q = self.generate_transition_matrix(f, s1, s2)
+        Q = self.generate_transition_matrix(s1, s2, f)
 
         #Q is stochastic, guranteed to have left eigenvector v w/ eigenvalue 1
         # v satisfies Q'v = v, i.e. (Q' - I)v = 0, v = null(A) w/ A = Q' - v.
@@ -35,29 +36,33 @@ class Game:
         u, s, vh = np.linalg.svd(A)
         null_space = np.compress(s <= tolerance, vh, axis=0)
 
-        try:
-            v = null_space[0]
-            v = np.absolute(v/sum(v))
+        v = null_space[0]
+        v = np.absolute(v/sum(v))
+        return v
 
-            # Check that every value in v and in v * Q are close
-            assert all(numpy_isclose(a, b) for a, b in zip(v, np.matmul(v, Q)))
+        # try:
+        #     v = null_space[0]
+        #     v = np.absolute(v/sum(v))
 
-        except Exception as e:
-            print("Get stationary distribution failed. s1 = {:}, s2 = {:}.".format(s1, s2)) 
-            print("Q \n {:}".format(Q))
-            raise(e)
+        #     # Check that every value in v and in v * Q are close
+        #     assert all(numpy_isclose(a, b) for a, b in zip(v, np.matmul(v, Q)))
+
+        # except Exception as e:
+        #     print("Get stationary distribution failed. s1 = {:}, s2 = {:}.".format(s1, s2)) 
+        #     print("Q \n {:}".format(Q))
+        #     raise(e)
 
         # save v
         # self.v_dict[(s1, s2)] = v
-        return v
+        # return v
 
 
     def get_unilateral_stationary_dist(self, s1, s2):
 
-        (f1, f2) = self.get_f()
+        (f1, f2) = self.f
 
-        v1 = self.get_stationary_dist(f1, s1, s2)
-        v2 = self.get_stationary_dist(f2, s1, s2)
+        v1 = self.get_stationary_dist(s1, s2, f1)
+        v2 = self.get_stationary_dist(s1, s2, f2)
 
         return (v1 + v2)/2.0
 
@@ -68,7 +73,7 @@ class Game:
         if self.game_transition_dynamics == "Unilateral_Dictator":
             v = self.get_unilateral_stationary_dist(s1, s2)
         else:
-            v = self.get_stationary_dist(self.get_f(), s1, s2)
+            v = self.get_stationary_dist(s1, s2, self.f)
 
         s1_payoff = np.dot(v, self.p1_payoffs)
         s2_payoff = np.dot(v, self.p2_payoffs)
@@ -81,7 +86,7 @@ class Game:
         if self.game_transition_dynamics == "Unilateral_Dictator":
             v = self.get_unilateral_stationary_dist(s1, s2)
         else:
-            v = self.get_stationary_dist(self.get_f(), s1, s2)
+            v = self.get_stationary_dist(s1, s2, self.f)
 
         s1_payoff = np.dot(v, self.p1_payoffs)
         s2_payoff = np.dot(v, self.p2_payoffs)

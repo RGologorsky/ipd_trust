@@ -1,2 +1,5 @@
 # ignore .pyc files
 *.pyc
+new_code/data/
+code/
+graphs/

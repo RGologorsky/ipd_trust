@@ -25,7 +25,7 @@ class TwoGame(Game):
     state_to_num = {val: key for key, val in num_to_state.items()}
 
     # Which game is next? f takes in each player's Prob[prefer Game 1] and outputs Prob[next is Game 1]
-    def __init__(self, b1, c1, b2, c2, game_transition_dynamics):
+    def __init__(self, b1, c1, b2, c2, resolution_rule):
         self.b1 = b1
         self.c1 = c1
         self.alpha1 = b1/c1
@@ -34,7 +34,7 @@ class TwoGame(Game):
         self.c2 = c2
 
         self.set_payoffs()
-        self.set_game_transition_dynamics(game_transition_dynamics)
+        self.set_resolution_rule(resolution_rule)
 
 
     def set_payoffs(self):
@@ -47,21 +47,21 @@ class TwoGame(Game):
         self.p2_payoffs = np.asarray([b1-c1, b1, -c1, 0, b2-c2, b2, -c2, 0]);
 
 
-    def set_game_transition_dynamics(self, game_transition_dynamics):
+    def set_resolution_rule(self, resolution_rule):
 
-        self.game_transition_dynamics = game_transition_dynamics
+        self.resolution_rule = resolution_rule
 
 
-        if game_transition_dynamics == "EqualSay_G2_Default":
+        if resolution_rule == "EqualSay_G2_Default":
             # Prob[G1] = Prob[player 1 AND player 2 want G1]
             def f(a,b): return a*b
 
-        elif game_transition_dynamics == "EqualSay_G1_Default":
+        elif resolution_rule == "EqualSay_G1_Default":
             # Prob[G1] = 1 - Prob[player 1 AND player 2 want G2]
             # = Prob[player 1 OR player 2 want G1] = a + b - a*b
             def f(a,b): return a + b - a*b # return 1 - (1-a)*(1-b)
 
-        elif game_transition_dynamics == "Unilateral_Dictator":
+        elif resolution_rule == "Unilateral_Dictator":
             # Prob[G1] =  Prob[player 1 wants G1] = a, or
             # Prob[G1] = Prob[plaeyr 2 wants G2] = b.
             def f_player1_dictator (a,b): return a 
@@ -70,16 +70,16 @@ class TwoGame(Game):
             f = (f_player1_dictator, f_player2_dictator)
 
             
-        elif game_transition_dynamics == "Player2_Dictator":
+        elif resolution_rule == "Player2_Dictator":
             # Prob[G1] =  Prob[player 1 wants G1]
             def f(a,b): return b
 
-        elif game_transition_dynamics == "Random_Dictator":
+        elif resolution_rule == "Random_Dictator":
             # Prob[G1] =  Prob[player 1 dictator and he wants G1] + Prob[player 2 dictator and he wants G1]
             def f(a,b):
                 return 0.5*a + 0.5*b
 
-        elif game_transition_dynamics == "Random":
+        elif resolution_rule == "Random":
             # Prob[G1] =  0.50
             def f(a,b):
                 return 0.5

@@ -1,78 +1,69 @@
 import numpy as np
 from helper_functions import get_index, bin_array
 
+import pprint as pp
 ### IMPORTANT ###
 ### CHECK G1 OR G2 DEFAULT DEV STATES, LINE 162 ####
 #################
 
-# only for two-games. Returns dictionary d; For strat vs. strat, d[state_id] = next_state
-def get_Q_dictionary(strat, game):
-	Q = game.generate_transition_matrix(strat, strat, game.f)
-
-	return {state_num: game.state_to_num[tuple(np.matmul(game.num_to_state[state_num], Q))] \
-			for state_num in range(game.num_states)}
-
 # returns dictionary d; d[state_id] = player 2's payoff in that state 
-def get_p2_payoff_dictionary(strat, game):
+def get_p2_payoff_dict(strat, game):
 	return {num: game.p2_payoffs[num] for num in range(game.num_states)}
 
+# only for two-games. Returns dictionary d; For strat vs. strat, d[state_id] = next_state
+def get_Q_dict(strat, game):
+	Q = game.generate_transition_matrix(strat, strat, game.f)
+
+	Q_dict = {}
+	for state_num in range(game.num_states):
+		prob_next_states = np.matmul(game.num_to_state[state_num], Q)
+		next_states      = np.nonzero(prob_next_states)[0]
+
+		# list of (next_state, prob_next_state)
+		Q_dict[state_num] = list(zip(next_states, prob_next_states[next_states]))
+		
+	return Q_dict
 
 # value iteration
-def get_payoffs_from_each_state(Q_dict, payoff_dict, delta):
+def get_state_values(strat, game, delta, tol=10**-7):
+	payoff_dict = get_p2_payoff_dict(strat, game)
+	Q_dict = get_Q_dict(strat, game)
 
+	# print number of iterations
+	t = 0
 
+	# init state values to 0 for states 1CC to 2DD (state nums 0 to 7)
+	vals = {state_num:0.0 for state_num in range(game.num_states)}
 
+	vals_converged = False
 
-# returns the seen states until a cycle is created and the cycle start index
-def get_cycle_info(start_state, Q_dict):
+	while not vals_converged:
 
-	# initialize
-	curr_state   = start_state
-	seen_states  = []
+		#print("T = {:d}".format(t))
+		#pp.pprint(vals)
 
-	cycle_start_index = -1
+		vals_converged = True
+		for state_num in range(game.num_states):
 
-	# 8 states => cycle within 9 steps
-	while cycle_start_index == -1:
+			# updated estimate of state value
+			new_estimate = 0.0
+			for (next_state, prob_next_state) in Q_dict[state_num]:
+				next_state_payoff = delta**t * payoff_dict[next_state]
+				new_estimate += prob_next_state * (next_state_payoff + delta**t*vals[next_state])
 
-		# add state
-		seen_states.append(curr_state)
+			t += 1
+			#print("state {:d}, new_estimate {:f}".format(state_num, new_estimate))
+			# avg payoff per round
+			#new_estimate = new_estimate * (1-delta)
 
-		# move forward one step
-		curr_state  = Q_dict[curr_state]
+			# update value if needed
+			if abs(vals[state_num] - new_estimate) > tol:
+				vals[state_num] = new_estimate 
+				vals_converged = False
 
-		# update whether cycle are seen
-		cycle_start_index = get_index(curr_state, seen_states)
+	print("T = {:d}".format(t))
+	return vals
 
-	# found cycle
-	cycle_len = len(seen_states) - cycle_start_index
-	return (seen_states, cycle_start_index, cycle_len)
-
-# returns whether strat vs. strat ends in full coop given start state
-def is_full_coop_an_absorbing_state(start_state, Q_dict):
-	(seen_states, cycle_start_index, cycle_len) = get_cycle_info(start_state, Q_dict)
-	return (seen_states[cycle_start_index] == 0 and cycle_len == 1)
-
-# returns average payoff per round, w/round 0 = start state.
-def get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict):
-
-	expected_num_rounds = 1.0/(1.0 - delta)
-	seen_states, cycle_start_index, cycle_len = get_cycle_info(start_state, Q_dict)
-
-	# calculating payoffs
-	cycle_discount_factor =  1.0/(1.0 - delta**cycle_len)
-
-	discounted_payoff = 0
-
-	for i, state in enumerate(seen_states):
-
-		if i < cycle_start_index:
-			discounted_payoff += payoff_dict[state] * delta**i
-		else:
-			discounted_payoff += payoff_dict[state] * delta**i * cycle_discount_factor
-
-	# return average payoff per round
-	return discounted_payoff/expected_num_rounds
 
 
 # returns set of states reachable by a single deviations from player 2
@@ -88,7 +79,7 @@ def get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict):
 
 # checks whether (strategy, strategy) is an SPE
 def random_is_spe(strat, game, delta):
-
+	pass
 
 
 

@@ -12,7 +12,7 @@ def get_p2_payoff_dict(strat, game):
 
 # only for two-games. Returns dictionary d; For strat vs. strat, d[state_id] = next_state
 def get_Q_dict(strat, game):
-	Q = game.generate_transition_matrix(strat, strat, game.f)
+	Q = game.generate_resolution_rule_matrix(strat, strat, game.f)
 
 	Q_dict = {}
 	for state_num in range(game.num_states):
@@ -25,7 +25,7 @@ def get_Q_dict(strat, game):
 	return Q_dict
 
 # value iteration
-def get_state_values(strat, game, delta, tol=10**-7):
+def get_state_values(strat, game, delta, tol=10**-9):
 	payoff_dict = get_p2_payoff_dict(strat, game)
 	Q_dict = get_Q_dict(strat, game)
 
@@ -78,37 +78,43 @@ def get_state_values(strat, game, delta, tol=10**-7):
 #################
 
 # checks whether (strategy, strategy) is an SPE
-def random_is_spe(strat, game, delta):
-	pass
+def is_spe(strat, game, delta, resolution_rule):
 
-
-
-def is_spe(strat, game, delta, transition):
-	Q_dict      = get_Q_dictionary(strat, game) 
-	payoff_dict = get_p2_payoff_dictionary(strat, game)
+	state_values = get_state_values(strat, game, delta)
 
 	# check all possible single deviations
 	for prior_state in range(game.num_states):
 
-		baseline_start_state = Q_dict[prior_state]
-		baseline_payoff = get_avg_round_payoff(baseline_start_state, delta, Q_dict, payoff_dict)
+		baseline_payoff = state_values[prior_state]
 
-		if transition == "EqualSay_G2_Default":
+		# check if exists useful deviation
+
+		p1_action = 
+
+		for dev_action in ("1C", "1D", "2D", "2D"):
+			dev_states =  
+
+		if resolution_rule == "EqualSay_G2_Default":
 			all_possible_devs = g2_default_possible_dev_states(prior_state, strat)
 
-		elif transition == "EqualSay_G1_Default":
+		elif resolution_rule == "EqualSay_G1_Default":
 			all_possible_devs = g1_default_possible_dev_states(prior_state, strat)
 
-		elif transition == "NA":
+		elif resolution_rule == "Random":
+			all_possible_devs = random_possible_dev_states(prior_state, strat)
+
+		elif resolution_rule == "NA":
 			all_possible_devs = one_game_possible_dev_states(prior_state, strat)
 
 		else:
-			raise Exception("Unrecognized Transition Strat")
+			raise Exception("Unrecognized resolution_rule Strat")
+	
 
-		# remove baseline next state from consideration 
-		all_possible_devs.discard(baseline_start_state)
+		# check whether any deviation is useful
+		for dev_state in all_possible_devs:
+			dev_payoff = payoff_dict[dev_state] + delta * state_values[dev_payoff]
 
-		dev_payoffs = [get_avg_round_payoff(start_state, delta, Q_dict, payoff_dict) 
+		dev_payoffs = [dev_payoff + delta * 
 						for start_state in all_possible_devs]
 
 		max_dev_payoff = max(dev_payoffs)
@@ -142,18 +148,18 @@ def find_all_spe(game, delta):
 	return spe_lst
 
 
-def is_full_coop_spe(strat, game, delta, transition="EqualSay_G2_Default"):
-	return is_full_coop_strat(strat, game) and is_spe(strat, game, delta, transition)
+def is_full_coop_spe(strat, game, delta, resolution_rule="EqualSay_G2_Default"):
+	return is_full_coop_strat(strat, game) and is_spe(strat, game, delta, resolution_rule)
 
 # returns a list of all pure strategies s.t. (strat, strat) is an SPE
-def find_all_coop_spe(game, delta, transition):
+def find_all_coop_spe(game, delta, resolution_rule):
 	num_strats = 2**game.strat_len
 	spe_lst = []
 
 	for i in range(num_strats):
 		strat = bin_array(i, game.strat_len)
 
-		if is_full_coop_strat(strat, game) and is_spe(strat, game, delta, transition):
+		if is_full_coop_strat(strat, game) and is_spe(strat, game, delta, resolution_rule):
 			spe_lst.append(strat)
 	return spe_lst
 
@@ -170,7 +176,7 @@ def pprint_strat(strat):
 	print(res)
 
 
-def verbose_is_spe(strat, game, delta, transition):
+def verbose_is_spe(strat, game, delta, resolution_rule):
 	Q_dict      = get_Q_dictionary(strat, game) 
 	payoff_dict = get_p2_payoff_dictionary(strat, game)
 
@@ -180,17 +186,17 @@ def verbose_is_spe(strat, game, delta, transition):
 		baseline_start_state = Q_dict[prior_state]
 		baseline_payoff = get_avg_round_payoff(baseline_start_state, delta, Q_dict, payoff_dict)
 
-		if transition == "EqualSay_G2_Default":
+		if resolution_rule == "EqualSay_G2_Default":
 			all_possible_devs = g2_default_possible_dev_states(prior_state, strat)
 
-		elif transition == "EqualSay_G1_Default":
+		elif resolution_rule == "EqualSay_G1_Default":
 			all_possible_devs = g1_default_possible_dev_states(prior_state, strat)
 
-		elif transition == "NA":
+		elif resolution_rule == "NA":
 			all_possible_devs = one_game_possible_dev_states(prior_state, strat)
 
 		else:
-			raise Exception("Unrecognized Transition Strat")
+			raise Exception("Unrecognized resolution_rule Strat")
 
 		# remove baseline next state from consideration 
 		all_possible_devs.discard(baseline_start_state)
@@ -240,7 +246,7 @@ def verbose_is_full_coop_strat(strat, game):
 	return True
 
 # returns True if: not SPE & useful dev is not 1CC
-def verbose_not_1cc_useful_dev(strat, game, delta, transition):
+def verbose_not_1cc_useful_dev(strat, game, delta, resolution_rule):
 	Q_dict      = get_Q_dictionary(strat, game) 
 	payoff_dict = get_p2_payoff_dictionary(strat, game)
 
@@ -250,17 +256,17 @@ def verbose_not_1cc_useful_dev(strat, game, delta, transition):
 		baseline_start_state = Q_dict[prior_state]
 		baseline_payoff = get_avg_round_payoff(baseline_start_state, delta, Q_dict, payoff_dict)
 
-		if transition == "EqualSay_G2_Default":
+		if resolution_rule == "EqualSay_G2_Default":
 			all_possible_devs = g2_default_possible_dev_states(prior_state, strat)
 
-		elif transition == "EqualSay_G1_Default":
+		elif resolution_rule == "EqualSay_G1_Default":
 			all_possible_devs = g1_default_possible_dev_states(prior_state, strat)
 
-		elif transition == "NA":
+		elif resolution_rule == "NA":
 			all_possible_devs = one_game_possible_dev_states(prior_state, strat)
 
 		else:
-			raise Exception("Unrecognized Transition Strat")
+			raise Exception("Unrecognized resolution_rule Strat")
 
 		# remove baseline next state from consideration 
 		all_possible_devs.discard(baseline_start_state)
@@ -291,13 +297,13 @@ def verbose_not_1cc_useful_dev(strat, game, delta, transition):
 	return False
 
 
-def verbose_find_not_1cc_useful_dev(game, delta, transition):
+def verbose_find_not_1cc_useful_dev(game, delta, resolution_rule):
 	num_strats = 2**game.strat_len
 	not_spe_lst = []
 
 	for i in range(num_strats):
 		strat = bin_array(i, game.strat_len)
 
-		if is_full_coop_strat(strat, game) and verbose_not_1cc_useful_dev(strat, game, delta, transition):
+		if is_full_coop_strat(strat, game) and verbose_not_1cc_useful_dev(strat, game, delta, resolution_rule):
 			not_spe_lst.append(strat)
 	return not_spe_lst
